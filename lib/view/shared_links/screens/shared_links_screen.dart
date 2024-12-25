@@ -594,7 +594,7 @@ class SharedLinksScreenState extends State<SharedLinksScreen> {
                                   ["end_odometer"]) -
                               double.parse(sharedLinksData['data'][index]
                                   ["start_odometer"]))
-                          .toString(),
+                          .toStringAsFixed(1),
                       style: TextStyle(
                           fontSize: dataController.normalTextSize.value),
                     ),
