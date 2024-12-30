@@ -13,7 +13,7 @@ class ApiConfig {
   static const String baseUrl = "http://54.204.132.185:8088/api";
   static const String shareSettingUrl = "http://54.204.132.185/temporary/";
 
-  static const String webSocketUrl = "wss://moovetrax.com:8000/websocket";
+  static const String webSocketUrl = "ws://54.204.132.185:8000/websocket";
 
   static const googleMapAkey = "AIzaSyBnxnshloFKsE9cI5xXgx4F_L9RZ1TQZhk";
   static const schematicsUrl = "http://install.moovetrax.com";

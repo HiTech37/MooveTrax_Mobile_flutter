@@ -1,4 +1,15 @@
-------- Build apk file
+===========------- Build apk file
+
+In /android/local.properties
+set the app versionName and versionCode
+    i,e: 
+        sdk.dir=C:\\Users\\KKK\\AppData\\Local\\Android\\Sdk
+        flutter.sdk=C:\\flutter
+        flutter.buildMode=release
+        flutter.versionName=1.1.3
+        flutter.versionCode=33
+        flutter.minSdkVersion=21
+
 flutter build apk --release --target-platform android-arm,android-arm64,android-x64
 
 output: build/app/outputs/flutter-apk/
@@ -14,7 +25,7 @@ output: build/app/outputs/bundle/release/app-release.aab
 Receive the upload_certicate.perm and my-release-key.jks
 
 
---------- Deployment for Apple store -------------
+===========--------- Deployment for Apple store -------------
 
 Deploy by using Xcode
 
