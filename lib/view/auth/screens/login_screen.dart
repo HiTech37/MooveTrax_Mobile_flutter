@@ -236,11 +236,16 @@ class LoginScreenState extends State<LoginScreen> {
                       ),
                       InkWell(
                           onTap: () async {
-                            if (await canLaunchUrl(
-                                Uri.parse(ApiConfig.oemSignUpUrl))) {
+                            final Uri uri = Uri.parse(ApiConfig.oemSignUpUrl);
+                            if (await canLaunchUrl(uri)) {
                               await launchUrl(
-                                Uri.parse(ApiConfig.oemSignUpUrl),
-                                mode: LaunchMode.externalApplication,
+                                uri,
+                                mode: LaunchMode.inAppWebView,
+                                webViewConfiguration:
+                                    const WebViewConfiguration(
+                                  enableJavaScript: true,
+                                  enableDomStorage: true,
+                                ),
                               );
                             } else {
                               throw "Could not launch this url";
