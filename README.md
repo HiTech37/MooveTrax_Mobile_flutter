@@ -1,13 +1,14 @@
 ===========------- Build apk file
 
 In /android/local.properties
-set the app versionName and versionCode
+Set the app versionName and versionCode after close all emulator.
+
     i,e: 
         sdk.dir=C:\\Users\\KKK\\AppData\\Local\\Android\\Sdk
         flutter.sdk=C:\\flutter
         flutter.buildMode=release
-        flutter.versionName=1.1.3
-        flutter.versionCode=33
+        flutter.versionName=1.1.4
+        flutter.versionCode=34
         flutter.minSdkVersion=21
 
 flutter build apk --release --target-platform android-arm,android-arm64,android-x64

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-Future<dynamic> deleteDialog(BuildContext context) {
-  Future<dynamic> dialog = showDialog(
+Future<bool> deleteDialog(BuildContext context) {
+  return showDialog<bool>(
     context: context,
     builder: (_) {
       return AlertDialog(
@@ -22,14 +22,15 @@ Future<dynamic> deleteDialog(BuildContext context) {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text("Are you sure you want to delete this user?"),
+            const Text(
+                "Are you sure you want to permanently delete this account?"),
             const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 TextButton(
                   onPressed: () {
-                    Navigator.pop(context, false);
+                    Navigator.pop(context, false); // Return false
                   },
                   child: const Text("No"),
                 ),
@@ -38,7 +39,7 @@ Future<dynamic> deleteDialog(BuildContext context) {
                   style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.redAccent),
                   onPressed: () {
-                    Navigator.pop(context, true);
+                    Navigator.pop(context, true); // Return true
                   },
                   child: const Text("Yes"),
                 )
@@ -48,7 +49,5 @@ Future<dynamic> deleteDialog(BuildContext context) {
         ),
       );
     },
-  );
-
-  return dialog.then((res) => res ?? false);
+  ).then((res) => res ?? false); // Default to false if dismissed
 }

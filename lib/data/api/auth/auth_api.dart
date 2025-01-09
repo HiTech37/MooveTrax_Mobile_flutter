@@ -188,4 +188,14 @@ class AuthApi {
       throw DioExceptions;
     }
   }
+
+  Future<dynamic> deleteAccount(dynamic params) async {
+    final Response response =
+        await dioClient.dio.post(ApiConfig.deleteAccount, data: params);
+    if (response.statusCode.success) {
+      return response.data;
+    } else {
+      throw DioExceptions;
+    }
+  }
 }

@@ -100,4 +100,8 @@ class AuthRepository {
   Future<Either<String, dynamic>> sendInstallerAuthEmail(dynamic params) async {
     return checkItemDataFailOrSuccess(authApi.sendInstallerAuthEmail(params));
   }
+
+  Future<Either<String, dynamic>> deleteAccount(dynamic userID) async {
+    return checkItemDataFailOrSuccess(authApi.deleteAccount(userID));
+  }
 }

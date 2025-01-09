@@ -327,4 +327,19 @@ class AuthController extends GetxController
       },
     );
   }
+
+  Future<void> deleteAccount(dynamic params) async {
+    apiStatus.value = ApiState.loading;
+    Either<String, dynamic> failureOrSuccess =
+        await authRepository.deleteAccount(params);
+    failureOrSuccess.fold(
+      (String failure) {
+        apiStatus.value = ApiState.failure;
+        errorMessage.value = failure;
+      },
+      (dynamic data) {
+        apiStatus.value = ApiState.success;
+      },
+    );
+  }
 }

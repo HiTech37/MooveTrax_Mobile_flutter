@@ -26,6 +26,7 @@ class ApiConfig {
   static const String installerAuth = '/installer-auth';
   static const String installerSignUp = '/installer-signup';
   static const String resetPassword = '/password/reset';
+  static const String deleteAccount = '/user-profile/delete';
   static const String getIccidPrefixList = '/get-iccid-prefix-list';
   static const String checkGpsidIccidMatched = '/check-gpsid-iccid-matched';
   static const String checkInstallerDevice = '/check-installer-device';

@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:moovetrax/common/controller/base_controller.dart';
+import 'package:moovetrax/common/dialog/delete_dialog.dart';
 import 'package:moovetrax/common/widget/default_button.dart';
 import 'package:moovetrax/di.dart';
 import 'package:moovetrax/view/account/widget/escrow_widget.dart';
@@ -20,6 +21,9 @@ class AccountScreenState extends State<AccountScreen> {
   String email = '';
   String name = '';
   String phone = '';
+  int userID = 0;
+  double escrow_balance = 0;
+  int device_cnt = 0;
   bool updatingProfile = false;
   bool resettingPassword = false;
   final AuthController authController = getIt<AuthController>();
@@ -134,6 +138,10 @@ class AccountScreenState extends State<AccountScreen> {
           name = authController.profileData.value['name'] ?? '';
           email = authController.profileData.value['email'] ?? '';
           phone = authController.profileData.value['phone'] ?? '';
+          userID = authController.profileData.value['id'] ?? 0;
+          escrow_balance = double.parse(
+              authController.profileData.value['escrow_balance'] ?? 0);
+          device_cnt = authController.profileData.value['devices'].length;
         },
       );
     }
@@ -349,6 +357,64 @@ class AccountScreenState extends State<AccountScreen> {
                     }
                   }
                 }),
+            const SizedBox(
+              height: 15,
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                bool isDelete = await deleteDialog(context);
+                if (isDelete) {
+                  if (device_cnt > 0) {
+                    Get.snackbar(
+                        "Request Failed", "All cars must first be Deleted!",
+                        backgroundColor: Colors.red,
+                        colorText: Colors.white,
+                        animationDuration: const Duration(milliseconds: 700));
+                  } else if (escrow_balance > 0) {
+                    Get.snackbar("Request Failed",
+                        "Escrow must have no balance in order to delete!",
+                        backgroundColor: Colors.red,
+                        colorText: Colors.white,
+                        animationDuration: const Duration(milliseconds: 700));
+                  } else {
+                    await authController.deleteAccount({'userID': userID});
+                    if (authController.apiStatus.value == ApiState.failure) {
+                      Get.snackbar(
+                          "Request Failed", authController.errorMessage.value,
+                          backgroundColor: Colors.red,
+                          colorText: Colors.white,
+                          animationDuration: const Duration(milliseconds: 300));
+                    } else {
+                      await authController.logOut();
+                      if (authController.apiStatus.value == ApiState.success) {
+                        Get.offAllNamed('/login');
+                      } else {
+                        Get.snackbar(
+                            "Logout Failled", authController.errorMessage.value,
+                            backgroundColor: Colors.red,
+                            colorText: Colors.white,
+                            animationDuration:
+                                const Duration(milliseconds: 300));
+                      }
+                    }
+                  }
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                elevation: 12.0,
+                textStyle: const TextStyle(
+                  fontSize: 20, // Set font size
+                  color: Colors.white,
+                ),
+                backgroundColor: Colors.red, // Set background color to red
+                minimumSize: const Size(
+                    double.infinity, 60), // Full width and 50px height
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5), // Set border radius
+                ),
+              ),
+              child: const Text('Delete Account'),
+            ),
           ],
         ),
       )),

@@ -1501,7 +1501,7 @@ class MapScreenState extends State<MapScreen> {
               ),
               const Spacer(),
               Text(
-                '${playHistoryData[currentPlayPosition.round()]['signal'] / 31 * 100}%',
+                '${(playHistoryData[currentPlayPosition.round()]['signal'] / 31 * 100).round()}%',
                 style: TextStyle(fontSize: dataController.normalTextSize.value),
               ),
               const Spacer(),
