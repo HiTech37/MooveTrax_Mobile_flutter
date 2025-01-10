@@ -70,6 +70,8 @@ class MapScreenState extends State<MapScreen> {
   BitmapDescriptor markerIcon = BitmapDescriptor.defaultMarker;
   bool mapCreated = false;
   List<Place> items = [];
+  bool deviceSortDirection = false;
+  String deviceSortField = "";
   bool installSortDirection = false;
   bool nameSortDirection = false;
   bool balanceSortDirection = false;
@@ -762,6 +764,9 @@ class MapScreenState extends State<MapScreen> {
     }
     _manager.setItems(newItems);
     updatingDevicesFromSocket = false;
+    if (deviceSortField != "") {
+      sortVehicles(deviceSortField, deviceSortDirection);
+    }
     setState(() {});
   }
 
@@ -2079,6 +2084,8 @@ class MapScreenState extends State<MapScreen> {
 
                                 // Update the state
                                 setState(() {
+                                  deviceSortField = result;
+                                  deviceSortDirection = sortDirection;
                                   sortVehicles(result, sortDirection);
                                 });
 
