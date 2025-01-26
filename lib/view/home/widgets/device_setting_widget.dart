@@ -96,6 +96,16 @@ class _DeviceSettingWidgetState extends State<DeviceSettingWidget> {
     super.dispose();
   }
 
+  Color _getProgressColor(double value) {
+    if (value <= 0.3) {
+      return Colors.red; // Low value - Red
+    } else if (value > 0.3 && value <= 0.7) {
+      return Colors.orange; // Medium value - Orange
+    } else {
+      return Colors.green; // High value - Green
+    }
+  }
+
   Future<void> updateCommandStatus() async {
     await deviceController
         .getDeviceCommandsDetail(dataController.currentDeviceId.value);
@@ -995,6 +1005,19 @@ class _DeviceSettingWidgetState extends State<DeviceSettingWidget> {
                                 : double.parse(
                                         selectedDeviceData['mt2v_dc_volt']) /
                                     15,
+                            backgroundColor: Colors.grey[
+                                300], // Optional: Background color of the bar
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              _getProgressColor(
+                                selectedDeviceData['deviceType'] == 'tesla'
+                                    ? double.parse(selectedDeviceData[
+                                            'mt2v_dc_volt']) /
+                                        100
+                                    : double.parse(selectedDeviceData[
+                                            'mt2v_dc_volt']) /
+                                        15,
+                              ),
+                            ),
                           )),
                         ],
                       ),

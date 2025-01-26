@@ -2,15 +2,18 @@ class ApiConfig {
   ApiConfig._();
 
   static const token = "";
-  static const paypalSubscriptionUrl =
-      "https://moovetrax.com/app-subscription-payment.html";
-  static const paypalOneTimePaymentUrl =
-      "https://moovetrax.com/app-one-time-payment.html";
-  static const String siteUrl = "https://moovetrax.com/";
-  static const String baseUrl = "https://moovetrax.com:8088/api";
-  static const String shareSettingUrl = "https://moovetrax.com/temporary/";
 
-  static const String webSocketUrl = "wss://moovetrax.com:8000/websocket";
+/*test url */
+  static const paypalSubscriptionUrl =
+      "https://test.moovetrax.com/app-subscription-payment.html";
+
+  static const paypalOneTimePaymentUrl =
+      "https://test.moovetrax.com/app-one-time-payment.html";
+  static const String siteUrl = "https://test.moovetrax.com/";
+  static const String baseUrl = "https://test.moovetrax.com:8088/api";
+  static const String shareSettingUrl = "https://test.moovetrax.com/temporary/";
+
+  static const String webSocketUrl = "wss://test.moovetrax.com:8000/websocket";
 
   static const googleMapAkey = "AIzaSyBnxnshloFKsE9cI5xXgx4F_L9RZ1TQZhk";
   static const schematicsUrl = "http://install.moovetrax.com";
