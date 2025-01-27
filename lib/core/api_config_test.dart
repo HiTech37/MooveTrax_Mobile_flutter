@@ -17,7 +17,7 @@ class ApiConfig {
 
   static const googleMapAkey = "AIzaSyBnxnshloFKsE9cI5xXgx4F_L9RZ1TQZhk";
   static const schematicsUrl = "http://install.moovetrax.com";
-  static const String oemSignUpUrl = "https://moovetrax.com/oem-signup";
+  static const String oemSignUpUrl = "https://test.moovetrax.com/oem-signup";
   static const Duration receiveTimeout = Duration(milliseconds: 15000);
   static const Duration connectionTimeout = Duration(milliseconds: 15000);
   static const String gogleMapAapiUrl = "https://maps.googleapis.com/maps/api/";

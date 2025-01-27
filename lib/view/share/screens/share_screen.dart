@@ -21,7 +21,7 @@ import 'package:moovetrax/viewmodel/auth/controller/auth_controller.dart';
 import 'package:moovetrax/viewmodel/data_controller.dart';
 import 'package:moovetrax/viewmodel/device/controller/device_controller.dart';
 import 'package:timezone/data/latest.dart' as tz;
-import 'package:timezone/standalone.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 enum CarApproveOption { always, manual, aiApprove }
 
@@ -36,6 +36,7 @@ class ShareScreen extends StatefulWidget {
 
 class ShareScreenState extends State<ShareScreen> {
   List<dynamic> deviceList = [];
+  List<dynamic> turoTripList = [];
   Map<String, dynamic> deviceValue = {};
   String howToUploadRequirementsVideo = "Wiks5TRTzBA";
   String? selectedTimeZone;
@@ -362,6 +363,8 @@ class ShareScreenState extends State<ShareScreen> {
         unkillAfterList.clear();
         selectedDeviceSharePageData =
             deviceController.selectedDeviceSharePageData.value;
+        setTuroTripList(selectedDeviceSharePageData['turoTripList']);
+        print("debug=>$turoTripList");
         if (selectedDeviceSharePageData['device']['share_settings'] == null) {
           shareSetting = {};
         } else {
@@ -456,18 +459,99 @@ class ShareScreenState extends State<ShareScreen> {
     }
   }
 
+  void setTuroTripList(List<dynamic> turoTripData) {
+    if (turoTripData.isNotEmpty) {
+      setState(() {
+        turoTripList = []; // Clear the list before adding new items
+        turoTripData.forEach((element) {
+          final String summary = element['summary'] ?? '';
+          final List<String> summaryArr = summary.split('-');
+          final String summaryStr = summaryArr[0].trim();
+          final List<String> summaryWordArr = summaryStr.split(' ');
+          final String summaryFirstWord = summaryWordArr.first;
+          final String summaryLastWord = summaryWordArr.last;
+          final int? startTimestamp = element['start_timestamp'];
+          final int? endTimestamp = element['end_timestamp'];
+          final String? tzId = element['tzid'];
+
+          String startTime = "";
+          String endTime = "";
+
+          if (element['uid'] == null || element['uid'] == "") {
+            startTime = getFormattedTime(element['start'], true);
+            endTime = getFormattedTime(element['end'], true);
+          } else {
+            startTime = startTimestamp != null
+                ? convertUnixTimestampToTimezone(
+                    startTimestamp, "yyyy-MM-dd HH:mm", tzId)
+                : "";
+            endTime = endTimestamp != null
+                ? convertUnixTimestampToTimezone(
+                    endTimestamp, "yyyy-MM-dd HH:mm", tzId)
+                : "";
+          }
+          final String label =
+              "$summaryFirstWord - $summaryLastWord $startTime - $endTime";
+          turoTripList.add({
+            "id": element['id'],
+            "label": label,
+            "startTime": startTime,
+            "endTime": endTime,
+          });
+        });
+      });
+    }
+  }
+
+  String convertUnixTimestampToTimezone(
+      int unixtimestamp, String format, String? ianaTimezone) {
+    try {
+      tz.initializeTimeZones();
+      final tz.Location location =
+          ianaTimezone != null && ianaTimezone.isNotEmpty
+              ? tz.getLocation(ianaTimezone)
+              : tz.UTC;
+
+      final tz.TZDateTime dateTime = tz.TZDateTime.fromMillisecondsSinceEpoch(
+          location, unixtimestamp * 1000);
+      return DateFormat(format).format(dateTime);
+    } catch (e) {
+      return "";
+    }
+  }
+
+  String getFormattedTime(String? dateStr, [bool isOnlyStr = false]) {
+    try {
+      if (dateStr == null) return "";
+      final DateTime date = DateTime.parse(dateStr);
+
+      // Format the date string
+      final String formattedDate =
+          DateFormat('yyyy-MM-dd HH:mm:ss').format(date);
+      if (isOnlyStr) {
+        return formattedDate;
+      }
+      return formattedDate; // Keeping it simple; no additional library like moment
+    } catch (e) {
+      print("getFormattedTime error: $e");
+      return "";
+    }
+  }
+
   void updateDeviceData(String deviceID) async {
     await deviceController.getSelectedShareDevicePageData(deviceID);
     if (deviceController.apiStatus.value == ApiState.success) {
       setState(() {
         selectedDeviceSharePageData =
             deviceController.selectedDeviceSharePageData.value;
+        setTuroTripList(selectedDeviceSharePageData['turoTripList']);
+        print("debug=>$turoTripList");
         shareSetting =
             selectedDeviceSharePageData['device']['share_settings'] != null
                 ? jsonDecode(
                     selectedDeviceSharePageData['device']['share_settings'])
                 : {};
-        selectedTimeZone = shareSetting['timezone'];
+        // selectedTimeZone = shareSetting['timezone'];
         allotPerday = shareSetting['allot_per_day'] ?? '';
         shareMinutesBefore =
             (shareSetting['share_minutes_before'] ?? '').toString();
@@ -2103,6 +2187,36 @@ class ShareScreenState extends State<ShareScreen> {
     );
   }
 
+  Widget turoTripField() {
+    return DropdownMenu<dynamic>(
+      expandedInsets: const EdgeInsets.all(0),
+      initialSelection: deviceValue,
+      textStyle: TextStyle(fontSize: dataController.normalTextSize.value),
+      onSelected: (dynamic value) {
+        setState(() {
+          DateFormat dateFormat = DateFormat("yyyy-MM-dd HH:mm");
+          selectedFromDate = dateFormat.parse(value['startTime']);
+
+          selectedFromTime = TimeOfDay(
+              hour: selectedFromDate.hour, minute: selectedFromDate.minute);
+
+          selectedToDate = dateFormat.parse(value['endTime']);
+          selectedToTime = TimeOfDay(
+              hour: selectedToDate.hour, minute: selectedToDate.minute);
+        });
+      },
+      dropdownMenuEntries:
+          turoTripList.map<DropdownMenuEntry<dynamic>>((dynamic value) {
+        return DropdownMenuEntry<dynamic>(
+            value: value,
+            label: value['label'],
+            style: ButtonStyle(
+                textStyle: WidgetStateProperty.all(
+                    TextStyle(fontSize: dataController.normalTextSize.value))));
+      }).toList(),
+    );
+  }
+
   Widget timeZoneField() {
     return DropdownButton<String>(
       isExpanded: true,
@@ -2388,6 +2502,15 @@ class ShareScreenState extends State<ShareScreen> {
                             fontSize: dataController.normalTextSize.value),
                       ),
                       deviceField(),
+                      SizedBox(
+                        height: 20 * dataController.currentScaleFactor.value,
+                      ),
+                      Text(
+                        'Select Turo Trip',
+                        style: TextStyle(
+                            fontSize: dataController.normalTextSize.value),
+                      ),
+                      turoTripField(),
                       SizedBox(
                         height: 20 * dataController.currentScaleFactor.value,
                       ),
