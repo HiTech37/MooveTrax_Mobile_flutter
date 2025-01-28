@@ -150,6 +150,16 @@ class AuthApi {
     }
   }
 
+  Future<dynamic> deviceSignup(dynamic data) async {
+    final Response response =
+        await dioClient.dio.post(ApiConfig.deviceSignUp, data: data);
+    if (response.statusCode.success) {
+      return response.data;
+    } else {
+      throw DioExceptions;
+    }
+  }
+
   Future<bool> logOut() async {
     final Response response = await dioClient.dio.delete(ApiConfig.auth);
     if (response.statusCode.success) {

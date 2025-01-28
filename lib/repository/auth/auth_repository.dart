@@ -89,6 +89,10 @@ class AuthRepository {
     return checkItemDataFailOrSuccess(authApi.installerSignUp(data));
   }
 
+  Future<Either<String, dynamic>> deviceSignup(dynamic data) async {
+    return checkItemDataFailOrSuccess(authApi.deviceSignup(data));
+  }
+
   Future<Either<String, bool>> resetPassword(dynamic emailInfo) async {
     return checkItemFailOrSuccess(authApi.resetPassword(emailInfo));
   }

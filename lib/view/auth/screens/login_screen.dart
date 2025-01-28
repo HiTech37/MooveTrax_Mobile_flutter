@@ -235,6 +235,28 @@ class LoginScreenState extends State<LoginScreen> {
                         height: 10 * dataController.currentScaleFactor.value,
                       ),
                       InkWell(
+                          onTap: () {
+                            Get.toNamed('/device-signup');
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 10),
+                            alignment: Alignment.center,
+                            child: Text('DEVICE SIGNUP',
+                                style: TextStyle(
+                                    fontSize: 16 *
+                                        dataController.currentScaleFactor.value,
+                                    fontWeight: FontWeight.w600,
+                                    color: Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? darkThemeColorList['linkTextColor']
+                                        : lightThemeColorList[
+                                            'linkTextColor'])),
+                          )),
+                      SizedBox(
+                        height: 10 * dataController.currentScaleFactor.value,
+                      ),
+                      InkWell(
                           onTap: () async {
                             final Uri uri = Uri.parse(ApiConfig.oemSignUpUrl);
                             if (await canLaunchUrl(uri)) {

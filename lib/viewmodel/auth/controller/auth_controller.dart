@@ -21,6 +21,7 @@ class AuthController extends GetxController
   Rx<dynamic> escrowLogs = Rx<dynamic>(null);
   Rx<dynamic> deviceLoginData = Rx<dynamic>(null);
   Rx<dynamic> installerSignUpResult = Rx<dynamic>(null);
+  Rx<dynamic> deviceSignupResult = Rx<dynamic>(null);
   Rx<dynamic> installerData = Rx<dynamic>(null);
 
   String? get installerKey => box.read('installerKey');
@@ -105,6 +106,23 @@ class AuthController extends GetxController
       },
       (dynamic data) {
         installerSignUpResult.value = data;
+        apiStatus.value = ApiState.success;
+        errorMessage.value = '';
+      },
+    );
+  }
+
+  Future<void> deviceSignup(dynamic data) async {
+    apiStatus.value = ApiState.loading;
+    Either<String, dynamic> failureOrSuccess =
+        await authRepository.deviceSignup(data);
+    failureOrSuccess.fold(
+      (String failure) {
+        apiStatus.value = ApiState.failure;
+        errorMessage.value = failure;
+      },
+      (dynamic data) {
+        deviceSignupResult.value = data;
         apiStatus.value = ApiState.success;
         errorMessage.value = '';
       },

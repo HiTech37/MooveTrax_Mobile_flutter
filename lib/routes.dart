@@ -5,6 +5,7 @@ import 'package:moovetrax/view/account/screens/account_screen.dart';
 import 'package:moovetrax/view/account/screens/account_subscription.dart';
 import 'package:moovetrax/view/account/screens/device_subscription.dart';
 import 'package:moovetrax/view/auth/screens/installer_login_screen.dart';
+import 'package:moovetrax/view/auth/screens/device_signup_screen.dart';
 import 'package:moovetrax/view/auth/screens/installer_signup_screen.dart';
 import 'package:moovetrax/view/auth/screens/login_screen.dart';
 import 'package:moovetrax/view/auth/screens/reset_password_screen.dart';
@@ -45,6 +46,11 @@ final routes = [
   GetPage(
     name: '/installer-login',
     page: () => const InstallerLoginScreen(),
+    transitionDuration: Duration.zero,
+  ),
+  GetPage(
+    name: '/device-signup',
+    page: () => const DeviceSignupScreen(),
     transitionDuration: Duration.zero,
   ),
   GetPage(
