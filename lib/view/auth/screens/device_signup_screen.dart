@@ -425,19 +425,9 @@ class DeviceSignupScreenState extends State<DeviceSignupScreen> {
                                             colorText: Colors.white,
                                             animationDuration: const Duration(
                                                 milliseconds: 300));
-                                      } else {}
-                                      // if (authController.deviceSignupResult
-                                      //         .value['status'] ==
-                                      //     'waiting') {
-                                      //   Get.snackbar("Waiting",
-                                      //       "Please wait, Process can take up to 20minutes",
-                                      //       backgroundColor:
-                                      //           const Color.fromARGB(
-                                      //               255, 180, 87, 0),
-                                      //       colorText: Colors.white,
-                                      //       animationDuration: const Duration(
-                                      //           microseconds: 300));
-                                      // }
+                                      } else {
+                                        // Add the function
+                                      }
                                     }
                                   }
                                 }

@@ -387,7 +387,7 @@ class _DeviceSettingWidgetState extends State<DeviceSettingWidget> {
                 style: TextStyle(fontSize: dataController.smallTextSize.value),
               ),
               trailing: Icon(
-                Icons.check,
+                unlockStatus ? Icons.done_all : Icons.check,
                 size: dataController.iconSize.value,
                 color: unlockStatus ? Colors.green : Colors.grey[600],
               ),
@@ -420,7 +420,7 @@ class _DeviceSettingWidgetState extends State<DeviceSettingWidget> {
                 lastLockCommandDate,
                 style: TextStyle(fontSize: dataController.smallTextSize.value),
               ),
-              trailing: Icon(Icons.check,
+              trailing: Icon(lockStatus ? Icons.done_all : Icons.check,
                   size: dataController.iconSize.value,
                   color: lockStatus ? Colors.green : Colors.grey[600]),
             ),
@@ -452,7 +452,7 @@ class _DeviceSettingWidgetState extends State<DeviceSettingWidget> {
                 lastHornCommandDate,
                 style: TextStyle(fontSize: dataController.smallTextSize.value),
               ),
-              trailing: Icon(Icons.check,
+              trailing: Icon(hornStatus ? Icons.done_all : Icons.check,
                   size: dataController.iconSize.value,
                   color: hornStatus ? Colors.green : Colors.grey[600]),
             ),
@@ -505,7 +505,7 @@ class _DeviceSettingWidgetState extends State<DeviceSettingWidget> {
                       animationDuration: const Duration(milliseconds: 300));
                 }
               },
-              trailing: Icon(Icons.check,
+              trailing: Icon(unkillStatus ? Icons.done_all : Icons.check,
                   size: dataController.iconSize.value,
                   color: unkillStatus ? Colors.green : Colors.grey[600]),
               title: Text(
@@ -568,7 +568,7 @@ class _DeviceSettingWidgetState extends State<DeviceSettingWidget> {
                       animationDuration: const Duration(milliseconds: 300));
                 }
               },
-              trailing: Icon(Icons.check,
+              trailing: Icon(killStatus ? Icons.done_all : Icons.check,
                   size: dataController.iconSize.value,
                   color: killStatus ? Colors.green : Colors.grey[600]),
               title: Text(
@@ -610,7 +610,7 @@ class _DeviceSettingWidgetState extends State<DeviceSettingWidget> {
                 style: TextStyle(fontSize: dataController.smallTextSize.value),
               ),
               trailing: Icon(
-                Icons.check,
+                overSpeedStatus ? Icons.done_all : Icons.check,
                 size: dataController.iconSize.value,
                 color: overSpeedStatus ? Colors.green : Colors.grey[600],
               ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:moovetrax/common/controller/base_controller.dart';
 import 'package:moovetrax/core/common.dart';
 import 'package:moovetrax/di.dart';
@@ -23,9 +24,14 @@ class EventsScreenState extends State<DailyMileAgeScreen> {
   dynamic dailyMileAgeData;
   int currentPage = 1;
   TextEditingController pageNumberController = TextEditingController();
+
+  DateTime selectedFromDate = DateTime.now();
+  DateTime selectedToDate = DateTime.now().add(const Duration(days: 1));
+
   List<dynamic> deviceList = [
     {"id": "All", "name": "All"}
   ];
+  List<dynamic> deviceIds = [];
   final AuthController authController = getIt<AuthController>();
   final DataController dataController = Get.find<DataController>();
 
@@ -33,12 +39,15 @@ class EventsScreenState extends State<DailyMileAgeScreen> {
   dynamic dropdownValue;
 
   Future<void> _fetchData() async {
+    print("debug=>$deviceIds");
     if (!context.mounted) return;
     await reportsController.getMileAgeList({
-      'deviceId': dropdownValue['id'],
+      'deviceIds': deviceIds,
       'page': currentPage - 1,
       'rowsPerPage': rowsPerPage,
       'sortOrder': {},
+      'date_from': DateFormat('yyyy-MM-dd').format(selectedFromDate),
+      'date_to': DateFormat('yyyy-MM-dd').format(selectedToDate),
     });
     setState(() {
       dailyMileAgeData = reportsController.mileAgeData.value;
@@ -61,7 +70,7 @@ class EventsScreenState extends State<DailyMileAgeScreen> {
         // int pages = dailyMileAgeData['data'].length ~/ rowsPerPage;
         // if (dailyMileAgeData['data'].length % rowsPerPage != 0) {
         //   pages++;
-        // }
+        // }r
         // if (pages == 0) {
         //   totalPage = 1;
         // } else {
@@ -69,6 +78,36 @@ class EventsScreenState extends State<DailyMileAgeScreen> {
         // }
       }
     });
+  }
+
+  Future<void> selectFromDate(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: selectedFromDate,
+      firstDate: DateTime(2015),
+      lastDate: DateTime(2101),
+    );
+    if (pickedDate != null && pickedDate != selectedFromDate) {
+      setState(() {
+        selectedFromDate = pickedDate;
+        _fetchData();
+      });
+    }
+  }
+
+  Future<void> selectToDate(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: selectedToDate,
+      firstDate: DateTime(2015),
+      lastDate: DateTime(2101),
+    );
+    if (pickedDate != null && pickedDate != selectedToDate) {
+      setState(() {
+        selectedToDate = pickedDate;
+        _fetchData();
+      });
+    }
   }
 
   @override
@@ -85,6 +124,11 @@ class EventsScreenState extends State<DailyMileAgeScreen> {
       final dynamic devices = userData['devices'] ?? [];
       deviceList.addAll(devices);
       dropdownValue = deviceList[0];
+      for (var el in deviceList) {
+        if (el['id'] != "All") {
+          deviceIds.add(el['id']);
+        }
+      }
     }
     _fetchData(); // Fetch data when the screen initializes
   }
@@ -118,6 +162,7 @@ class EventsScreenState extends State<DailyMileAgeScreen> {
     });
   }
 
+  @override
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -168,89 +213,119 @@ class EventsScreenState extends State<DailyMileAgeScreen> {
           ),
         ],
       ),
-      body: Stack(
+      body: Column(
         children: [
-          SingleChildScrollView(
-            child: SizedBox(
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text('From',
+                    style: TextStyle(
+                        fontSize: dataController.normalTextSize.value)),
+                const SizedBox(width: 8),
+                InkWell(
+                  onTap: () => selectFromDate(context),
+                  child: Padding(
+                    padding: EdgeInsets.all(
+                        5 * dataController.currentScaleFactor.value),
+                    child: Text(
+                      DateFormat('yyyy-MM-dd')
+                          .format(selectedFromDate)
+                          .toString(),
+                      style: TextStyle(
+                          color: Colors.blue,
+                          fontSize: dataController.normalTextSize.value),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Text('To',
+                    style: TextStyle(
+                        fontSize: dataController.normalTextSize.value)),
+                const SizedBox(width: 8),
+                InkWell(
+                  onTap: () => selectToDate(context),
+                  child: Padding(
+                    padding: EdgeInsets.all(
+                        5 * dataController.currentScaleFactor.value),
+                    child: Text(
+                      DateFormat('yyyy-MM-dd')
+                          .format(selectedToDate)
+                          .toString(),
+                      style: TextStyle(
+                          color: Colors.blue,
+                          fontSize: dataController.normalTextSize.value),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              child: SizedBox(
                 width: double.infinity,
                 child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          minWidth: MediaQuery.of(context).size.width,
+                  scrollDirection: Axis.horizontal,
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                        minWidth: MediaQuery.of(context).size.width),
+                    child: DataTable(
+                      sortAscending: _sortAscending,
+                      sortColumnIndex: _sortColumnIndex,
+                      columns: [
+                        DataColumn(
+                          label: Text("Date (GMT-0)",
+                              style: TextStyle(
+                                  fontSize:
+                                      dataController.normalTextSize.value)),
+                          onSort: (columnIndex, ascending) {
+                            _sort<String>(
+                                (data) => data['date'].toString(), columnIndex);
+                          },
                         ),
-                        child: DataTable(
-                          sortAscending: _sortAscending,
-                          sortColumnIndex: _sortColumnIndex,
-                          columns: [
-                            DataColumn(
-                              label: Row(
-                                children: [
-                                  Text(
-                                    "Date ( GMT-0 )",
+                        DataColumn(
+                          label: Text("Distance",
+                              style: TextStyle(
+                                  fontSize:
+                                      dataController.normalTextSize.value)),
+                          onSort: (columnIndex, ascending) {
+                            _sort<String>(
+                                (data) => data['mileage_real'].toString(),
+                                columnIndex);
+                          },
+                        ),
+                      ],
+                      rows: dailyMileAgeData != null
+                          ? List<DataRow>.generate(
+                              dailyMileAgeData['data'].length,
+                              (index) => DataRow(
+                                cells: [
+                                  DataCell(Text(
+                                    convertUTCtoLocal(dailyMileAgeData['data']
+                                            [index]["date"]
+                                        .toString()),
                                     style: TextStyle(
                                         fontSize: dataController
                                             .normalTextSize.value),
-                                  ),
-                                ],
-                              ),
-                              onSort: (columnIndex, ascending) {
-                                _sort<String>(
-                                  (data) => data['date'].toString(),
-                                  columnIndex,
-                                );
-                              },
-                            ),
-                            DataColumn(
-                              label: Row(
-                                children: [
-                                  Text(
-                                    "Distance",
+                                  )),
+                                  DataCell(Text(
+                                    dailyMileAgeData['data'][index]["mileage"]
+                                        .toString(),
                                     style: TextStyle(
                                         fontSize: dataController
                                             .normalTextSize.value),
-                                  ),
+                                  )),
                                 ],
                               ),
-                              onSort: (columnIndex, ascending) {
-                                _sort<String>(
-                                  (data) => data['mileage_real'].toString(),
-                                  columnIndex,
-                                );
-                              },
-                            ),
-                          ],
-                          rows: dailyMileAgeData != null
-                              ? List<DataRow>.generate(
-                                  dailyMileAgeData['data'].length,
-                                  (index) => DataRow(
-                                    cells: [
-                                      DataCell(
-                                        Text(
-                                          convertUTCtoLocal(
-                                              dailyMileAgeData['data'][index]
-                                                      ["date"]
-                                                  .toString()),
-                                          style: TextStyle(
-                                              fontSize: dataController
-                                                  .normalTextSize.value),
-                                        ),
-                                      ),
-                                      DataCell(
-                                        Text(
-                                          dailyMileAgeData['data'][index]
-                                                  ["mileage"]
-                                              .toString(),
-                                          style: TextStyle(
-                                              fontSize: dataController
-                                                  .normalTextSize.value),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                )
-                              : [],
-                        )))),
+                            )
+                          : [],
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ),
           Obx(() => reportsController.apiStatus.value == ApiState.loading
               ? Container(
@@ -271,80 +346,6 @@ class EventsScreenState extends State<DailyMileAgeScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            // InkWell(
-            //   child: Icon(
-            //     Icons.navigate_before,
-            //     size: dataController.iconSize.value,
-            //   ),
-            //   onTap: () {
-            //     if (reportsController.apiStatus.value == ApiState.loading) {
-            //       return;
-            //     }
-            //     if (currentPage == 1) return;
-            //     setState(() {
-            //       currentPage = currentPage - 1;
-            //       pageNumberController.text = currentPage.toString();
-            //     });
-            //     _fetchData();
-            //   },
-            // ),
-            // Text(
-            //   dailyMileAgeData == null ? '' : '$currentPage / $totalPage',
-            //   style: TextStyle(fontSize: dataController.normalTextSize.value),
-            // ),
-            // InkWell(
-            //   child: Icon(
-            //     Icons.navigate_next,
-            //     size: dataController.iconSize.value,
-            //   ),
-            //   onTap: () {
-            //     if (reportsController.apiStatus.value == ApiState.loading) {
-            //       return;
-            //     }
-            //     if (currentPage == totalPage) return;
-            //     setState(() {
-            //       currentPage = currentPage + 1;
-            //       pageNumberController.text = currentPage.toString();
-            //     });
-            //     _fetchData();
-            //   },
-            // ),
-            // Expanded(
-            //   child: TextField(
-            //     controller: pageNumberController,
-            //     keyboardType: TextInputType.number,
-            //     textAlign: TextAlign.center,
-            //     style:
-            //         TextStyle(fontSize: dataController.appBarTitleSize.value),
-            //     decoration: const InputDecoration(
-            //         hintText: 'Enter page number',
-            //         contentPadding: EdgeInsets.all(0)),
-            //     onSubmitted: (value) {
-            //       setState(() {
-            //         if (int.parse(value) > totalPage) {
-            //           setState(() {
-            //             currentPage = totalPage;
-            //             pageNumberController.text = currentPage.toString();
-            //           });
-            //         } else if (int.parse(value) < 1) {
-            //           setState(() {
-            //             currentPage = 1;
-            //             pageNumberController.text = currentPage.toString();
-            //           });
-            //         } else {
-            //           setState(() {
-            //             currentPage = int.parse(value);
-            //             pageNumberController.text = currentPage.toString();
-            //           });
-            //         }
-            //         _fetchData();
-            //       });
-            //     },
-            //   ),
-            // ),
-            // SizedBox(
-            //   width: 15 * dataController.currentScaleFactor.value,
-            // ),
             const Spacer(),
             DropdownButton<dynamic>(
               value: dropdownValue,
@@ -355,19 +356,30 @@ class EventsScreenState extends State<DailyMileAgeScreen> {
               onChanged: (dynamic value) {
                 setState(() {
                   dropdownValue = value;
+                  if (value['id'] == "All") {
+                    for (var el in deviceList) {
+                      if (el['id'] != "All") {
+                        deviceIds.add(el['id']);
+                      }
+                    }
+                  } else {
+                    deviceIds = [];
+                    deviceIds.add(value['id']);
+                  }
                 });
                 _fetchData();
               },
               items: deviceList.map<DropdownMenuItem<dynamic>>((dynamic value) {
                 return DropdownMenuItem<dynamic>(
-                    value: value,
-                    child: SizedBox(
-                      width: 120 * dataController.currentScaleFactor.value,
-                      child: Text(value['name']!,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                              fontSize: dataController.normalTextSize.value)),
-                    ));
+                  value: value,
+                  child: SizedBox(
+                    width: 120 * dataController.currentScaleFactor.value,
+                    child: Text(value['name']!,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            fontSize: dataController.normalTextSize.value)),
+                  ),
+                );
               }).toList(),
             ),
           ],
