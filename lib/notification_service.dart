@@ -67,6 +67,14 @@ class NotificationService {
           msgTitle = "";
           msgBody = bodyData['deviceName'] + " Un-Killed by " + userName;
           break;
+        case "Unlocked_by_Bluetooth":
+          msgTitle = bodyData['deviceName'] + " BT Unlock";
+          msgBody = bodyData['deviceName'] + " was locked by Bluetooth";
+          break;
+        case "Locked_by_Bluetooth":
+          msgTitle = bodyData['deviceName'] + " BT locked";
+          msgBody = bodyData['deviceName'] + " was locked by Bluetooth";
+          break;
         default:
           msgTitle = "";
           msgBody = bodyData['deviceName'] + " " + title + " by " + userName;

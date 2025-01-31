@@ -25,8 +25,8 @@ class EventsScreenState extends State<DailyMileAgeScreen> {
   int currentPage = 1;
   TextEditingController pageNumberController = TextEditingController();
 
-  DateTime selectedFromDate = DateTime.now();
-  DateTime selectedToDate = DateTime.now().add(const Duration(days: 1));
+  DateTime selectedFromDate = DateTime.now().add(const Duration(days: -7));
+  DateTime selectedToDate = DateTime.now();
 
   List<dynamic> deviceList = [
     {"id": "All", "name": "All"}
@@ -39,7 +39,9 @@ class EventsScreenState extends State<DailyMileAgeScreen> {
   dynamic dropdownValue;
 
   Future<void> _fetchData() async {
-    print("debug=>$deviceIds");
+    print("deviceList=>${deviceList.length}");
+    print("deviceIds=>${deviceIds.length}");
+
     if (!context.mounted) return;
     await reportsController.getMileAgeList({
       'deviceIds': deviceIds,
@@ -340,44 +342,71 @@ class EventsScreenState extends State<DailyMileAgeScreen> {
       resizeToAvoidBottomInset: true,
       bottomSheet: BottomAppBar(
         padding: EdgeInsets.symmetric(
-            horizontal: 10 * dataController.currentScaleFactor.value,
-            vertical: 5 * dataController.currentScaleFactor.value),
+          horizontal: 10 * dataController.currentScaleFactor.value,
+          vertical: 5 * dataController.currentScaleFactor.value,
+        ),
         height: dataController.bottomAppBarHeight.value,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             const Spacer(),
             DropdownButton<dynamic>(
-              value: dropdownValue,
-              icon: Icon(Icons.arrow_drop_down,
-                  size: dataController.iconSize.value),
+              value: deviceIds.isEmpty
+                  ? null
+                  : deviceList.length == deviceIds.length + 1
+                      ? deviceList
+                          .firstWhere((device) => device['name'] == "All")
+                      : deviceList.firstWhere(
+                          (device) => device['id'] == deviceIds.first),
+              icon: Icon(
+                Icons.arrow_drop_down,
+                size: dataController.iconSize.value,
+              ),
               underline: Container(),
               elevation: 16,
               onChanged: (dynamic value) {
                 setState(() {
-                  dropdownValue = value;
                   if (value['id'] == "All") {
+                    deviceIds.clear();
                     for (var el in deviceList) {
-                      if (el['id'] != "All") {
+                      if (el['id'] != "All" && !deviceIds.contains(el['id'])) {
                         deviceIds.add(el['id']);
                       }
                     }
                   } else {
-                    deviceIds = [];
-                    deviceIds.add(value['id']);
+                    if (deviceIds.contains(value['id'])) {
+                      deviceIds.remove(value['id']);
+                    } else {
+                      deviceIds.add(value['id']);
+                    }
                   }
                 });
                 _fetchData();
               },
               items: deviceList.map<DropdownMenuItem<dynamic>>((dynamic value) {
+                bool isSelected = deviceIds.contains(value['id']);
                 return DropdownMenuItem<dynamic>(
                   value: value,
-                  child: SizedBox(
-                    width: 120 * dataController.currentScaleFactor.value,
-                    child: Text(value['name']!,
+                  child: Row(
+                    children: [
+                      if (isSelected)
+                        Icon(
+                          Icons.check,
+                          color: Colors.green,
+                          size: 20 * dataController.currentScaleFactor.value,
+                        )
+                      else
+                        SizedBox(
+                            width:
+                                30 * dataController.currentScaleFactor.value),
+                      Text(
+                        value['name']!,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                            fontSize: dataController.normalTextSize.value)),
+                          fontSize: dataController.normalTextSize.value,
+                        ),
+                      ),
+                    ],
                   ),
                 );
               }).toList(),

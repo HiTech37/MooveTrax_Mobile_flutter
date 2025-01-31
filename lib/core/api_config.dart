@@ -2,22 +2,19 @@ class ApiConfig {
   ApiConfig._();
 
   static const token = "";
-
-/*test url */
   static const paypalSubscriptionUrl =
-      "https://test.moovetrax.com/app-subscription-payment.html";
-
+      "https://moovetrax.com/app-subscription-payment.html";
   static const paypalOneTimePaymentUrl =
-      "https://test.moovetrax.com/app-one-time-payment.html";
-  static const String siteUrl = "https://test.moovetrax.com/";
-  static const String baseUrl = "https://test.moovetrax.com:8088/api";
-  static const String shareSettingUrl = "https://test.moovetrax.com/temporary/";
+      "https://moovetrax.com/app-one-time-payment.html";
+  static const String siteUrl = "https://moovetrax.com/";
+  static const String baseUrl = "https://moovetrax.com:8088/api";
+  static const String shareSettingUrl = "https://moovetrax.com/temporary/";
 
-  static const String webSocketUrl = "wss://test.moovetrax.com:8000/websocket";
+  static const String webSocketUrl = "wss://moovetrax.com:8000/websocket";
 
   static const googleMapAkey = "AIzaSyBnxnshloFKsE9cI5xXgx4F_L9RZ1TQZhk";
   static const schematicsUrl = "http://install.moovetrax.com";
-  static const String oemSignUpUrl = "https://test.moovetrax.com/oem-signup";
+  static const String oemSignUpUrl = "https://moovetrax.com/oem-signup";
   static const Duration receiveTimeout = Duration(milliseconds: 15000);
   static const Duration connectionTimeout = Duration(milliseconds: 15000);
   static const String gogleMapAapiUrl = "https://maps.googleapis.com/maps/api/";
