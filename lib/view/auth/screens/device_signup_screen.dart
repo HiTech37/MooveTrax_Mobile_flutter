@@ -426,7 +426,7 @@ class DeviceSignupScreenState extends State<DeviceSignupScreen> {
                                             animationDuration: const Duration(
                                                 milliseconds: 300));
                                       } else {
-                                        // Add the function
+                                        Get.offAllNamed('/login');
                                       }
                                     }
                                   }
