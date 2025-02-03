@@ -40,9 +40,14 @@ for example: version: 1.1.2+32  -> update 1.1.2+32
 
 brew install flutter
 
+flutter upgrade
+
 flutter pub get
 
 flutter pub upgrade
+
+cd ios
+pod update Firebase/Messaging
 
 open -a Simulator
 
