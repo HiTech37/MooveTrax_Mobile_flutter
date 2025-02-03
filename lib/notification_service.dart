@@ -69,7 +69,7 @@ class NotificationService {
           break;
         case "Unlocked_by_Bluetooth":
           msgTitle = bodyData['deviceName'] + " BT Unlock";
-          msgBody = bodyData['deviceName'] + " was locked by Bluetooth";
+          msgBody = bodyData['deviceName'] + " was Unlocked by Bluetooth";
           break;
         case "Locked_by_Bluetooth":
           msgTitle = bodyData['deviceName'] + " BT locked";
