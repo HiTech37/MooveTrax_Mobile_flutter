@@ -42,9 +42,10 @@ brew install flutter
 
 flutter upgrade
 
+flutter clean
+flutter pub upgrade
 flutter pub get
 
-flutter pub upgrade
 
 cd ios
 pod update Firebase/Messaging

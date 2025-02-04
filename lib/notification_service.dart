@@ -1,5 +1,6 @@
+// ignore_for_file: prefer_interpolation_to_compose_strings
+
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'dart:convert';
 
 class NotificationService {
   static FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -40,51 +41,7 @@ class NotificationService {
       android: androidNotificationDetail,
     );
 
-    String msgBody = "";
-    String msgTitle = "";
-    String userName = "";
-    try {
-      final Map<String, dynamic> bodyData = jsonDecode(body);
-      userName = bodyData['userName'] ?? bodyData['userEmail'] ?? '';
-      switch (title) {
-        case "Lock":
-          msgTitle = bodyData['deviceName'] + " " + "Locked";
-          msgBody = bodyData['deviceName'] + " Locked by " + userName;
-          break;
-        case "Unlock":
-          msgTitle = bodyData['deviceName'] + " " + "Unlocked";
-          msgBody = bodyData['deviceName'] + " Unlocked by " + userName;
-          break;
-        case "LightHorn":
-          msgTitle = bodyData['deviceName'] + " " + "Horn";
-          msgBody = bodyData['deviceName'] + " Horn by " + userName;
-          break;
-        case "Kill":
-          msgTitle = "";
-          msgBody = bodyData['deviceName'] + " killed by " + userName;
-          break;
-        case "Unkill":
-          msgTitle = "";
-          msgBody = bodyData['deviceName'] + " Un-Killed by " + userName;
-          break;
-        case "Unlocked_by_Bluetooth":
-          msgTitle = bodyData['deviceName'] + " BT Unlock";
-          msgBody = bodyData['deviceName'] + " was Unlocked by Bluetooth";
-          break;
-        case "Locked_by_Bluetooth":
-          msgTitle = bodyData['deviceName'] + " BT locked";
-          msgBody = bodyData['deviceName'] + " was locked by Bluetooth";
-          break;
-        default:
-          msgTitle = "";
-          msgBody = bodyData['deviceName'] + " " + title + " by " + userName;
-          break;
-      }
-    } catch (e) {
-      print("Error decoding JSON body: $e");
-    }
-
-    flutterLocalNotificationsPlugin
-        .show(0, msgTitle, msgBody, notificationDetails, payload: payload);
+    flutterLocalNotificationsPlugin.show(0, title, body, notificationDetails,
+        payload: payload);
   }
 }

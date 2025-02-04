@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:easy_image_viewer/easy_image_viewer.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -6,6 +8,7 @@ import 'package:moovetrax/di.dart';
 import 'package:moovetrax/viewmodel/auth/controller/auth_controller.dart';
 import 'package:moovetrax/viewmodel/data_controller.dart';
 import 'package:moovetrax/viewmodel/device/controller/device_controller.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 enum DeviceOption { off, smoke, gas }
 
@@ -64,6 +67,7 @@ class DeviceManageScreenState extends State<DeviceManageScreen> {
   String make = "";
 
   bool savingDeviceData = false;
+  bool processingTeslaSignup = false;
   dynamic iccIDList = [];
   final AuthController authController = getIt<AuthController>();
   dynamic selectedIccID;
@@ -163,6 +167,126 @@ class DeviceManageScreenState extends State<DeviceManageScreen> {
             animationDuration: const Duration(milliseconds: 300));
       }
     }
+  }
+
+  void _showTeslaSignupDialog(BuildContext context, String title) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        bool processingTeslaSignup =
+            false; // Declare it inside the dialog scope
+
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius:
+                    BorderRadius.circular(10), // Optional: Add rounded corners
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Center the Row of images
+                    Row(
+                      mainAxisAlignment:
+                          MainAxisAlignment.center, // Center the images
+                      children: [
+                        Image.asset(
+                          "asset/images/tesla_icon.jpg",
+                          height: 110 * dataController.currentScaleFactor.value,
+                        ),
+                        SizedBox(width: 10),
+                        Image.asset(
+                          "asset/images/moovetrax_icon.png",
+                          height: 110 * dataController.currentScaleFactor.value,
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 30),
+                    Text(
+                      'MooveTrax connects your car through a Tesla API.',
+                      style: TextStyle(
+                          fontSize:
+                              16 * dataController.currentScaleFactor.value,
+                          fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 30),
+                    Text(
+                      'After logging in, Please turn on ALL permissions by selecting ALL options so that MooveTrax can connect to your vehicle.',
+                      style: TextStyle(
+                        fontSize: 14 * dataController.currentScaleFactor.value,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    Text(
+                      'You may edit/revoke permission at any time from your Tesla app or by editing your car in MooveTrax.',
+                      style: TextStyle(
+                        fontSize: 14 * dataController.currentScaleFactor.value,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 30),
+                    ElevatedButton(
+                      onPressed: () async {
+                        setState(() {
+                          processingTeslaSignup = true;
+                        });
+                        await authController.getTeslaSignupUri();
+                        setState(() {
+                          processingTeslaSignup = false;
+                        });
+                        if (authController.apiStatus.value ==
+                            ApiState.failure) {
+                          Get.snackbar(
+                              "Login Failed", authController.errorMessage.value,
+                              backgroundColor: Colors.red,
+                              colorText: Colors.white,
+                              animationDuration:
+                                  const Duration(milliseconds: 300));
+                        } else {
+                          if (authController.teslaSignupUri.value != null &&
+                              authController.teslaSignupUri.value
+                                  is Map<String, dynamic> &&
+                              authController.teslaSignupUri.value
+                                  .containsKey('link')) {
+                            String teslaSignupUrl =
+                                authController.teslaSignupUri.value['link'];
+                            launchUrl(Uri.parse(teslaSignupUrl));
+                          }
+                        }
+                      },
+                      style: ButtonStyle(
+                        backgroundColor: WidgetStateProperty.all<Color>(
+                          const Color.fromARGB(255, 35, 35, 71),
+                        ),
+                        shape: WidgetStateProperty.all(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                        ),
+                      ),
+                      child: Text(
+                        processingTeslaSignup ? "Processing..." : "Continue",
+                        style: TextStyle(
+                          fontSize:
+                              16 * dataController.currentScaleFactor.value,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -1097,7 +1221,63 @@ class DeviceManageScreenState extends State<DeviceManageScreen> {
                         )
                       ],
                     ))),
-            const SingleChildScrollView()
+            SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.all(
+                    30 * dataController.currentScaleFactor.value),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 10),
+                    GestureDetector(
+                      onTap: () {
+                        _showTeslaSignupDialog(context, 'Tesla Icon');
+                      },
+                      child: Image.asset(
+                        "asset/images/tesla_icon.jpg",
+                        height: 200 * dataController.currentScaleFactor.value,
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    Text(
+                      "Other Cars",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 14 * dataController.currentScaleFactor.value,
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () async {
+                        await authController.getSmartcarSignupUri();
+                        if (authController.apiStatus.value ==
+                            ApiState.failure) {
+                          Get.snackbar(
+                              "Login Failed", authController.errorMessage.value,
+                              backgroundColor: Colors.red,
+                              colorText: Colors.white,
+                              animationDuration:
+                                  const Duration(milliseconds: 300));
+                        } else {
+                          if (authController.smartcarSignupUri.value != null &&
+                              authController.smartcarSignupUri.value
+                                  is Map<String, dynamic> &&
+                              authController.smartcarSignupUri.value
+                                  .containsKey('link')) {
+                            String smartcarSignupURL =
+                                authController.smartcarSignupUri.value['link'];
+                            launchUrl(Uri.parse(smartcarSignupURL));
+                          }
+                        }
+                      },
+                      child: Image.asset(
+                        "asset/images/oem_icon.jpg",
+                        height: 200 * dataController.currentScaleFactor.value,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
           ])),
     );
   }

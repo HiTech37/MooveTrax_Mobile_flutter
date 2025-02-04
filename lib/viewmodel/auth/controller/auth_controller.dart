@@ -17,6 +17,8 @@ class AuthController extends GetxController
   Rx<dynamic> checkInstallerDeviceResult = Rx<dynamic>(null);
   Rx<dynamic> checkGpsidIccidMatchedResult = Rx<dynamic>(null);
   Rx<dynamic> profileData = Rx<dynamic>(null);
+  Rx<dynamic> teslaSignupUri = Rx<dynamic>(null);
+  Rx<dynamic> smartcarSignupUri = Rx<dynamic>(null);
   Rx<dynamic> userEscrowCarBalance = Rx<dynamic>(null);
   Rx<dynamic> escrowLogs = Rx<dynamic>(null);
   Rx<dynamic> deviceLoginData = Rx<dynamic>(null);
@@ -140,6 +142,40 @@ class AuthController extends GetxController
       },
       (dynamic data) {
         profileData.value = data;
+        apiStatus.value = ApiState.success;
+        errorMessage.value = '';
+      },
+    );
+  }
+
+  Future<void> getTeslaSignupUri() async {
+    apiStatus.value = ApiState.loading;
+    Either<String, dynamic> failureOrSuccess =
+        await authRepository.getTeslaSignupUri();
+    failureOrSuccess.fold(
+      (String failure) {
+        apiStatus.value = ApiState.failure;
+        errorMessage.value = failure;
+      },
+      (dynamic data) {
+        teslaSignupUri.value = data;
+        apiStatus.value = ApiState.success;
+        errorMessage.value = '';
+      },
+    );
+  }
+
+  Future<void> getSmartcarSignupUri() async {
+    apiStatus.value = ApiState.loading;
+    Either<String, dynamic> failureOrSuccess =
+        await authRepository.getSmartcarSignupUri();
+    failureOrSuccess.fold(
+      (String failure) {
+        apiStatus.value = ApiState.failure;
+        errorMessage.value = failure;
+      },
+      (dynamic data) {
+        smartcarSignupUri.value = data;
         apiStatus.value = ApiState.success;
         errorMessage.value = '';
       },

@@ -110,6 +110,40 @@ class AuthApi {
     }
   }
 
+  Future<dynamic> getTeslaSignupUri() async {
+    try {
+      final Response response = await dioClient.dio.get(
+        ApiConfig.getTeslaSignupUri,
+      );
+      if (response.statusCode.success) {
+        return response.data;
+      } else {
+        throw DioExceptions;
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print(error);
+      }
+    }
+  }
+
+  Future<dynamic> getSmartcarSignupUri() async {
+    try {
+      final Response response = await dioClient.dio.get(
+        ApiConfig.getSmartcarSignupUri,
+      );
+      if (response.statusCode.success) {
+        return response.data;
+      } else {
+        throw DioExceptions;
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print(error);
+      }
+    }
+  }
+
   Future<dynamic> updateUserProfile(dynamic profileData) async {
     final Response response =
         await dioClient.dio.post(ApiConfig.userProfile, data: profileData);

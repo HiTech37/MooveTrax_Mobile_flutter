@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:moovetrax/common/controller/base_controller.dart';
+import 'package:moovetrax/common/widget/youtube_player.dart';
 import 'package:moovetrax/di.dart';
 import 'package:moovetrax/viewmodel/auth/controller/auth_controller.dart';
 import 'package:moovetrax/viewmodel/data_controller.dart';
@@ -47,11 +48,41 @@ class _LockUnlockSettingsWidgetState extends State<LockUnlockSettingsWidget> {
             SizedBox(
               height: 20 * dataController.currentScaleFactor.value,
             ),
-            Text(
-              'Lock and Unlock Settings',
-              style: TextStyle(
-                  fontSize: dataController.titleTextSize.value,
-                  fontWeight: FontWeight.w700),
+            Row(
+              children: [
+                Text(
+                  'Lock and Unlock Settings',
+                  style: TextStyle(
+                      fontSize: dataController.titleTextSize.value,
+                      fontWeight: FontWeight.w700),
+                ),
+                const Spacer(),
+                Tooltip(
+                    showDuration: const Duration(seconds: 5),
+                    message:
+                        "Renter will be forced to upload some pictures in order to access the car",
+                    triggerMode: TooltipTriggerMode.tap,
+                    child: Icon(
+                      Icons.info,
+                      size: dataController.iconSize.value,
+                    )),
+                InkWell(
+                  onTap: () {
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return const YouTubePlayerDialog(
+                              videoId: 'OOSRpQCf5dk');
+                        });
+                  },
+                  child: Text(
+                    'Video',
+                    style: TextStyle(
+                        color: Colors.blue,
+                        fontSize: dataController.normalTextSize.value),
+                  ),
+                ),
+              ],
             ),
             SizedBox(height: 20 * dataController.currentScaleFactor.value),
             Row(
