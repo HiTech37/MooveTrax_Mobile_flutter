@@ -29,7 +29,7 @@ class EventsScreenState extends State<DailyMileAgeScreen> {
   DateTime selectedToDate = DateTime.now();
 
   List<dynamic> deviceList = [
-    {"id": "All", "name": "All"}
+    {"id": "Devices", "name": "Devices"}
   ];
   List<dynamic> deviceIds = [];
   final AuthController authController = getIt<AuthController>();
@@ -124,12 +124,9 @@ class EventsScreenState extends State<DailyMileAgeScreen> {
     final dynamic userData = authController.profileData.value;
     if (userData != null) {
       final dynamic devices = userData['devices'] ?? [];
-      deviceList.addAll(devices);
-      dropdownValue = deviceList[0];
-      for (var el in deviceList) {
-        if (el['id'] != "All") {
-          deviceIds.add(el['id']);
-        }
+      dropdownValue = null; // No device selected initially
+      for (var el in devices) {
+        deviceList.add(el); // Add devices to the list
       }
     }
     _fetchData(); // Fetch data when the screen initializes
@@ -351,13 +348,11 @@ class EventsScreenState extends State<DailyMileAgeScreen> {
           children: [
             const Spacer(),
             DropdownButton<dynamic>(
-              value: deviceIds.isEmpty
-                  ? null
-                  : deviceList.length == deviceIds.length + 1
-                      ? deviceList
-                          .firstWhere((device) => device['name'] == "All")
-                      : deviceList.firstWhere(
-                          (device) => device['id'] == deviceIds.first),
+              value: deviceIds.isEmpty ? null : deviceList[0],
+              hint: Text(
+                "Select Devices", // Default hint text
+                style: TextStyle(fontSize: dataController.normalTextSize.value),
+              ),
               icon: Icon(
                 Icons.arrow_drop_down,
                 size: dataController.iconSize.value,
@@ -366,14 +361,7 @@ class EventsScreenState extends State<DailyMileAgeScreen> {
               elevation: 16,
               onChanged: (dynamic value) {
                 setState(() {
-                  if (value['id'] == "All") {
-                    deviceIds.clear();
-                    for (var el in deviceList) {
-                      if (el['id'] != "All" && !deviceIds.contains(el['id'])) {
-                        deviceIds.add(el['id']);
-                      }
-                    }
-                  } else {
+                  if (value['id'] != "Devices") {
                     if (deviceIds.contains(value['id'])) {
                       deviceIds.remove(value['id']);
                     } else {
@@ -400,7 +388,9 @@ class EventsScreenState extends State<DailyMileAgeScreen> {
                             width:
                                 30 * dataController.currentScaleFactor.value),
                       Text(
-                        value['name']!,
+                        value['name']! == "Devices"
+                            ? "Select Device"
+                            : value['name'],
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: dataController.normalTextSize.value,

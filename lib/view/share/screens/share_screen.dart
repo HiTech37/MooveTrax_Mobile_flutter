@@ -364,7 +364,6 @@ class ShareScreenState extends State<ShareScreen> {
         selectedDeviceSharePageData =
             deviceController.selectedDeviceSharePageData.value;
         setTuroTripList(selectedDeviceSharePageData['turoTripList']);
-        print("debug=>$turoTripList");
         if (selectedDeviceSharePageData['device']['share_settings'] == null) {
           shareSetting = {};
         } else {
@@ -459,6 +458,14 @@ class ShareScreenState extends State<ShareScreen> {
     }
   }
 
+  int getDifferencewithTwotimestamp(int startDate, int endDate) {
+    DateTime dateTime1 = DateTime.fromMillisecondsSinceEpoch(startDate * 1000);
+    DateTime dateTime2 = DateTime.fromMillisecondsSinceEpoch(endDate * 1000);
+    Duration difference = dateTime2.difference(dateTime1);
+
+    return difference.inHours;
+  }
+
   void setTuroTripList(List<dynamic> turoTripData) {
     if (turoTripData.isNotEmpty) {
       setState(() {
@@ -490,15 +497,21 @@ class ShareScreenState extends State<ShareScreen> {
                     endTimestamp, "yyyy-MM-dd HH:mm", tzId)
                 : "";
           }
-          final String label =
-              "$summaryFirstWord - $summaryLastWord $startTime - $endTime";
-          turoTripList.add({
-            "id": element['id'],
-            "label": label,
-            "startTime": startTime,
-            "endTime": endTime,
-          });
+          int currentTimeStamp = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+          int differ =
+              getDifferencewithTwotimestamp(currentTimeStamp, startTimestamp!);
+          if (differ > -24) {
+            final String label =
+                "$summaryFirstWord - $summaryLastWord $startTime - $endTime";
+            turoTripList.add({
+              "id": element['id'],
+              "label": label,
+              "startTime": startTime,
+              "endTime": endTime,
+            });
+          }
         });
+        turoTripList.sort((a, b) => a["startTime"].compareTo(b["startTime"]));
       });
     }
   }
@@ -545,7 +558,6 @@ class ShareScreenState extends State<ShareScreen> {
         selectedDeviceSharePageData =
             deviceController.selectedDeviceSharePageData.value;
         setTuroTripList(selectedDeviceSharePageData['turoTripList']);
-        print("debug=>$turoTripList");
         shareSetting =
             selectedDeviceSharePageData['device']['share_settings'] != null
                 ? jsonDecode(
