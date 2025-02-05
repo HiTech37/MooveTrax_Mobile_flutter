@@ -39,9 +39,6 @@ class EventsScreenState extends State<DailyMileAgeScreen> {
   dynamic dropdownValue;
 
   Future<void> _fetchData() async {
-    print("deviceList=>${deviceList.length}");
-    print("deviceIds=>${deviceIds.length}");
-
     if (!context.mounted) return;
     await reportsController.getMileAgeList({
       'deviceIds': deviceIds,
@@ -129,6 +126,7 @@ class EventsScreenState extends State<DailyMileAgeScreen> {
         deviceList.add(el); // Add devices to the list
       }
     }
+    deviceIds.add(int.parse(dataController.currentDeviceId.value));
     _fetchData(); // Fetch data when the screen initializes
   }
 

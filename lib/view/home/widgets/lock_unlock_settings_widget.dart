@@ -72,7 +72,7 @@ class _LockUnlockSettingsWidgetState extends State<LockUnlockSettingsWidget> {
                         context: context,
                         builder: (BuildContext context) {
                           return const YouTubePlayerDialog(
-                              videoId: 'OOSRpQCf5dk');
+                              videoId: '9_ODNwaxxO8');
                         });
                   },
                   child: Text(
