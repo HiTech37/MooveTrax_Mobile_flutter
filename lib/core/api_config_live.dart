@@ -28,7 +28,8 @@ class ApiConfig {
   static const String resetPassword = '/password/reset';
   static const String deleteAccount = '/user-profile/delete';
   static const String getIccidPrefixList = '/get-iccid-prefix-list';
-  static const String checkGpsidIccidMatched = '/check-gpsid-iccid-matched';
+  static const String checkGpsidIccidMatched =
+      '/devices/check-gpsid-iccid-matched';
   static const String checkInstallerDevice = '/check-installer-device';
   static const String event = '/warning/get-data-table';
   static const String command = '/command/get-data-table';

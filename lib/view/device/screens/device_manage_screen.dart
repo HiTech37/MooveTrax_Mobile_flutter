@@ -1,5 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'dart:async';
+
 import 'package:easy_image_viewer/easy_image_viewer.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -73,6 +75,9 @@ class DeviceManageScreenState extends State<DeviceManageScreen> {
   dynamic selectedIccID;
   String iccID = '';
   String gpsID = '';
+  int timerCnt = 0;
+
+  Timer? timer;
 
   @override
   void initState() {
@@ -93,6 +98,7 @@ class DeviceManageScreenState extends State<DeviceManageScreen> {
 
   @override
   void dispose() {
+    timer?.cancel();
     super.dispose();
   }
 
@@ -142,30 +148,38 @@ class DeviceManageScreenState extends State<DeviceManageScreen> {
       savingDeviceData = true;
     });
     await deviceController.addDeviceData(deviceData);
-    setState(() {
-      savingDeviceData = false;
-    });
     if (deviceController.apiStatus.value == ApiState.success) {
-      Get.snackbar("Device Added", 'Device successfully added!',
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-          animationDuration: const Duration(milliseconds: 300));
-      return;
+      if (deviceController.addDeviceDataResult.value['status'] == "waiting") {
+        setState(() {
+          savingDeviceData = true;
+        });
+        Get.snackbar("Processing", "Please wait.",
+            backgroundColor: Colors.yellow,
+            colorText: Colors.black,
+            animationDuration: const Duration(milliseconds: 300));
+
+        const Duration pollingInterval = Duration(seconds: 30);
+        const Duration timeoutDuration = Duration(minutes: 20);
+        DateTime startTime = DateTime.now();
+
+        Timer.periodic(pollingInterval, (Timer timer) async {
+          Duration elapsedTime = DateTime.now().difference(startTime);
+          if (elapsedTime >= timeoutDuration) {
+            timer.cancel();
+          }
+          await authController.checkGpsidIccidMatched(deviceData);
+          print("=>${authController.checkGpsidIccidMatchedResult.value}");
+        });
+      }
     }
     if (deviceController.apiStatus.value == ApiState.failure) {
-      Get.snackbar("Adding Failed", deviceController.errorMessage.value,
+      setState(() {
+        savingDeviceData = false;
+      });
+      Get.snackbar("Adding Failed1", deviceController.errorMessage.value,
           backgroundColor: Colors.red,
           colorText: Colors.white,
           animationDuration: const Duration(milliseconds: 300));
-    } else {
-      if (deviceController.addDeviceDataResult.value['error'] != "" ||
-          deviceController.addDeviceDataResult.value['error'] != null) {
-        Get.snackbar("Adding Failed",
-            deviceController.addDeviceDataResult.value['error'].toString(),
-            backgroundColor: Colors.red,
-            colorText: Colors.white,
-            animationDuration: const Duration(milliseconds: 300));
-      }
     }
   }
 
@@ -1168,7 +1182,9 @@ class DeviceManageScreenState extends State<DeviceManageScreen> {
                           children: [
                             Expanded(
                                 child: ElevatedButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                Get.offAllNamed('/home');
+                              },
                               style: ButtonStyle(
                                 backgroundColor: WidgetStateProperty.all<Color>(
                                     const Color.fromARGB(255, 71, 71, 71)),
@@ -1191,29 +1207,37 @@ class DeviceManageScreenState extends State<DeviceManageScreen> {
                               width: 20,
                             ),
                             Expanded(
-                                child: ElevatedButton(
-                              onPressed: () {
-                                saveDeviceData();
-                              },
-                              style: ButtonStyle(
-                                backgroundColor:
-                                    WidgetStateProperty.all<Color>(Colors.blue),
-                                shape: WidgetStateProperty.all(
-                                  RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(5),
+                              child: ElevatedButton(
+                                onPressed: savingDeviceData
+                                    ? null
+                                    : () {
+                                        saveDeviceData();
+                                      },
+                                style: ButtonStyle(
+                                  backgroundColor:
+                                      WidgetStateProperty.all<Color>(
+                                    savingDeviceData
+                                        ? Colors.grey
+                                        : Colors
+                                            .blue, // Change color when disabled
+                                  ),
+                                  shape: WidgetStateProperty.all(
+                                    RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(5),
+                                    ),
+                                  ),
+                                ),
+                                child: Text(
+                                  savingDeviceData ? "Saving..." : "Save",
+                                  style: TextStyle(
+                                    fontSize: 16 *
+                                        dataController.currentScaleFactor.value,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w500,
                                   ),
                                 ),
                               ),
-                              child: Text(
-                                savingDeviceData ? "Saving..." : "Save",
-                                style: TextStyle(
-                                  fontSize: 16 *
-                                      dataController.currentScaleFactor.value,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ))
+                            )
                           ],
                         ),
                         const SizedBox(

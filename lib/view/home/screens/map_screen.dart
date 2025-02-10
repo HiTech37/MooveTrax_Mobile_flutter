@@ -1559,7 +1559,8 @@ class MapScreenState extends State<MapScreen> {
         !drawingPolygonEnabled) {
       return;
     }
-    if (polygonPoints.isEmpty) return;
+    if (polygonPoints.length < 3) return;
+
     String area = "POLYGON ((";
     List<List<double>> coordinates = [];
     for (int i = 0; i < polygonPoints.length; i++) {
@@ -1568,38 +1569,26 @@ class MapScreenState extends State<MapScreen> {
       coordinates.add([polygonPoints[i].longitude, polygonPoints[i].latitude]);
     }
     area += "))";
-    await deviceController.createGeoFence({
-      'name': '',
-      'userId': authController.storageUserData?['id'],
-      'area': area,
-      'coordinates': coordinates
-    });
-    if (deviceController.apiStatus.value == ApiState.failure) {
-      Get.snackbar("Failed", deviceController.errorMessage.value,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-          animationDuration: const Duration(milliseconds: 300));
 
-      return;
-    }
-    if (deviceController.apiStatus.value == ApiState.success) {
-      dataController.setGeoFenceId(deviceController.createdGeoFenceId.value);
-      Get.dialog(Dialog(
-          insetPadding: const EdgeInsets.all(10),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0),
-          ),
-          child: GeoFenceEditWidget(onChanged: (value) async {
-            if (value) {
-              await initGeoFenceData();
-              polygonPoints.clear();
-              polygonsList.removeWhere(
-                  (polygon) => polygon.polygonId.value == "polygon_1");
+    Get.dialog(Dialog(
+        insetPadding: const EdgeInsets.all(10),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        child: GeoFenceEditWidget(
+            onChanged: (value) async {
+              if (value) {
+                await initGeoFenceData();
+                polygonPoints.clear();
+                polygonsList.removeWhere(
+                    (polygon) => polygon.polygonId.value == "polygon_1");
 
-              Get.back();
-            }
-          })));
-    }
+                Get.back();
+              }
+            },
+            actionType: 'create',
+            geofenceArea: area,
+            geofenceCoordinates: coordinates)));
   }
 
   void _createPolygon() {
@@ -1842,12 +1831,16 @@ class MapScreenState extends State<MapScreen> {
                                                               10.0),
                                                     ),
                                                     child: GeoFenceEditWidget(
-                                                        onChanged: (value) {
-                                                      if (value) {
-                                                        initGeoFenceData();
-                                                        Get.back();
-                                                      }
-                                                    })));
+                                                      onChanged: (value) {
+                                                        if (value) {
+                                                          initGeoFenceData();
+                                                          Get.back();
+                                                        }
+                                                      },
+                                                      geofenceArea: '',
+                                                      geofenceCoordinates: const [],
+                                                      actionType: 'edit',
+                                                    )));
                                                 break;
                                               case "Remove":
                                                 bool? confirmDelete =

@@ -103,38 +103,32 @@ String convertTimestampToLocal(String timestamp) {
   if (timestamp == 'null') return '';
 
   try {
-    // Convert the timestamp to an integer
     int timestampInt = int.parse(timestamp);
 
-    // Convert timestamp to DateTime in UTC
     DateTime utcDate =
         DateTime.fromMillisecondsSinceEpoch(timestampInt * 1000, isUtc: true);
 
-    // Convert to local timezone
     DateTime localDate = utcDate.toLocal();
 
-    // Format the date
     String formattedDate =
         DateFormat("MMMM dd, yyyy hh:mm a").format(localDate);
 
     return formattedDate;
   } catch (e) {
-    // Handle any parsing errors
     debugPrint('Error parsing timestamp: $e');
     return '';
   }
 }
 
 String convertUTCtoLocal(String utcDateString) {
-  if (utcDateString == '') return '';
-  // Parse UTC date string
+  if (utcDateString.isEmpty) return '';
+
   DateTime utcDate = DateTime.parse(utcDateString);
 
-  // Convert to local timezone
   DateTime localDate = utcDate.toLocal();
 
-  // Format the date
-  String formattedDate = DateFormat("MMMM dd, yyyy hh:mm a").format(localDate);
+  String formattedDate =
+      "${DateFormat('EEE').format(localDate)} ${DateFormat('MMM').format(localDate)} ${DateFormat('dd').format(localDate)}";
 
   return formattedDate;
 }
@@ -183,7 +177,7 @@ String convertUTCtoLocal4(String utcDateString) {
   DateTime localDate = utcDate.toLocal();
 
   // Format the date
-  String formattedDate = DateFormat("yyyy-MM-dd HH:mm").format(localDate);
+  String formattedDate = DateFormat("MM-dd HH:mm").format(localDate);
 
   return formattedDate;
 }

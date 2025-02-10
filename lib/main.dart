@@ -16,6 +16,22 @@ import 'package:moovetrax/view/home/home_screen.dart';
 import 'package:moovetrax/view/installer/installer_home_screen.dart';
 import 'package:moovetrax/viewmodel/data_controller.dart';
 import 'package:upgrader/upgrader.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+void _handleMessage(RemoteMessage message) {
+  if (message.data.containsKey('mapUrl')) {
+    _launchURL(message.data['mapUrl']);
+  }
+}
+
+void _launchURL(String url) async {
+  final Uri uri = Uri.parse(url);
+  if (await canLaunchUrl(uri)) {
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  } else {
+    debugPrint('Could not launch $url');
+  }
+}
 
 void main() async {
   // Ensure the Flutter framework is initialized before any async operations
@@ -65,13 +81,20 @@ void main() async {
             alert: true, badge: true, sound: true);
 
         // Handle the initial message if the app was opened via a notification
-        await FirebaseMessaging.instance.getInitialMessage();
+        FirebaseMessaging.instance
+            .getInitialMessage()
+            .then((RemoteMessage? message) {
+          if (message != null) {
+            _handleMessage(message);
+          }
+        });
 
         FirebaseMessaging.onMessage.listen((RemoteMessage message) {
           NotificationService.showLocalNotification('title', 'body', 'payload');
         });
-        FirebaseMessaging.onMessageOpenedApp.listen((event) {
-          // Handle notification tap here if needed
+
+        FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+          _handleMessage(message);
         });
       }
     }
@@ -94,8 +117,14 @@ void main() async {
       FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
           alert: true, badge: true, sound: true);
 
-      // Handle the initial message if the app was opened via a notification
-      await FirebaseMessaging.instance.getInitialMessage();
+      // Handle when the app is opened from a terminated state
+      FirebaseMessaging.instance
+          .getInitialMessage()
+          .then((RemoteMessage? message) {
+        if (message != null) {
+          _handleMessage(message);
+        }
+      });
 
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
         NotificationService.showLocalNotification(
@@ -103,8 +132,9 @@ void main() async {
             message.notification?.body ?? '',
             'payload');
       });
-      FirebaseMessaging.onMessageOpenedApp.listen((event) {
-        // Handle notification tap here if needed
+      // Handle when the app is opened from background/foreground
+      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+        _handleMessage(message);
       });
     }
 

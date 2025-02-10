@@ -470,7 +470,7 @@ class ShareScreenState extends State<ShareScreen> {
     if (turoTripData.isNotEmpty) {
       setState(() {
         turoTripList = []; // Clear the list before adding new items
-        turoTripData.forEach((element) {
+        for (var element in turoTripData) {
           final String summary = element['summary'] ?? '';
           final List<String> summaryArr = summary.split('-');
           final String summaryStr = summaryArr[0].trim();
@@ -510,7 +510,7 @@ class ShareScreenState extends State<ShareScreen> {
               "endTime": endTime,
             });
           }
-        });
+        }
         turoTripList.sort((a, b) => a["startTime"].compareTo(b["startTime"]));
       });
     }

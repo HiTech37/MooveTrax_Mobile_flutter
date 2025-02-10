@@ -159,7 +159,51 @@ class EventsScreenState extends State<DailyMileAgeScreen> {
     });
   }
 
-  @override
+  List<DataRow> generateRows() {
+    Set<String> seenDates = {}; // Track unique dates
+
+    return dailyMileAgeData != null
+        ? List<DataRow>.generate(
+            dailyMileAgeData['data'].length,
+            (index) {
+              String originalDate = convertUTCtoLocal(
+                  dailyMileAgeData['data'][index]["date"].toString());
+
+              // If the date was already seen, replace it with an empty string
+              String displayDate =
+                  seenDates.contains(originalDate) ? "" : originalDate;
+              seenDates.add(originalDate); // Mark date as seen
+
+              return DataRow(
+                cells: [
+                  DataCell(Text(
+                    displayDate, // Only display unique dates
+                    style: TextStyle(
+                        fontSize: dataController.normalTextSize.value),
+                  )),
+                  DataCell(
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 120),
+                      child: Text(
+                        dailyMileAgeData['data'][index]["deviceName"],
+                        style: TextStyle(
+                            fontSize: dataController.normalTextSize.value),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ),
+                  DataCell(Text(
+                    dailyMileAgeData['data'][index]["mileage"].toString(),
+                    style: TextStyle(
+                        fontSize: dataController.normalTextSize.value),
+                  )),
+                ],
+              );
+            },
+          )
+        : [];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -271,6 +315,7 @@ class EventsScreenState extends State<DailyMileAgeScreen> {
                     child: DataTable(
                       sortAscending: _sortAscending,
                       sortColumnIndex: _sortColumnIndex,
+                      columnSpacing: 10,
                       columns: [
                         DataColumn(
                           label: Text("Date (GMT-0)",
@@ -283,41 +328,28 @@ class EventsScreenState extends State<DailyMileAgeScreen> {
                           },
                         ),
                         DataColumn(
-                          label: Text("Distance",
+                          label: Text("Device",
                               style: TextStyle(
                                   fontSize:
                                       dataController.normalTextSize.value)),
                           onSort: (columnIndex, ascending) {
                             _sort<String>(
-                                (data) => data['mileage_real'].toString(),
+                                (data) => data['deviceName'].toString(),
+                                columnIndex);
+                          },
+                        ),
+                        DataColumn(
+                          label: Text("Miles",
+                              style: TextStyle(
+                                  fontSize:
+                                      dataController.normalTextSize.value)),
+                          onSort: (columnIndex, ascending) {
+                            _sort<num>((data) => (data['mileage_real'] as num),
                                 columnIndex);
                           },
                         ),
                       ],
-                      rows: dailyMileAgeData != null
-                          ? List<DataRow>.generate(
-                              dailyMileAgeData['data'].length,
-                              (index) => DataRow(
-                                cells: [
-                                  DataCell(Text(
-                                    convertUTCtoLocal(dailyMileAgeData['data']
-                                            [index]["date"]
-                                        .toString()),
-                                    style: TextStyle(
-                                        fontSize: dataController
-                                            .normalTextSize.value),
-                                  )),
-                                  DataCell(Text(
-                                    dailyMileAgeData['data'][index]["mileage"]
-                                        .toString(),
-                                    style: TextStyle(
-                                        fontSize: dataController
-                                            .normalTextSize.value),
-                                  )),
-                                ],
-                              ),
-                            )
-                          : [],
+                      rows: generateRows(),
                     ),
                   ),
                 ),

@@ -49,6 +49,7 @@ class _LockUnlockSettingsWidgetState extends State<LockUnlockSettingsWidget> {
               height: 20 * dataController.currentScaleFactor.value,
             ),
             Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   'Lock and Unlock Settings',
@@ -56,34 +57,38 @@ class _LockUnlockSettingsWidgetState extends State<LockUnlockSettingsWidget> {
                       fontSize: dataController.titleTextSize.value,
                       fontWeight: FontWeight.w700),
                 ),
-                const Spacer(),
-                Tooltip(
-                    showDuration: const Duration(seconds: 5),
-                    message:
-                        "Renter will be forced to upload some pictures in order to access the car",
-                    triggerMode: TooltipTriggerMode.tap,
-                    child: Icon(
-                      Icons.info,
-                      size: dataController.iconSize.value,
-                    )),
-                InkWell(
-                  onTap: () {
-                    showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return const YouTubePlayerDialog(
-                              videoId: '9_ODNwaxxO8');
-                        });
-                  },
-                  child: Text(
-                    'Video',
-                    style: TextStyle(
-                        color: Colors.blue,
-                        fontSize: dataController.normalTextSize.value),
-                  ),
-                ),
               ],
             ),
+            SizedBox(
+              height: 10 * dataController.currentScaleFactor.value,
+            ),
+            Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+              Tooltip(
+                  showDuration: const Duration(seconds: 5),
+                  message:
+                      "Renter will be forced to upload some pictures in order to access the car",
+                  triggerMode: TooltipTriggerMode.tap,
+                  child: Icon(
+                    Icons.info,
+                    size: dataController.iconSize.value,
+                  )),
+              InkWell(
+                onTap: () {
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return const YouTubePlayerDialog(
+                            videoId: '9_ODNwaxxO8');
+                      });
+                },
+                child: Text(
+                  'Video',
+                  style: TextStyle(
+                      color: Colors.blue,
+                      fontSize: dataController.normalTextSize.value),
+                ),
+              ),
+            ]),
             SizedBox(height: 20 * dataController.currentScaleFactor.value),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
