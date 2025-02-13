@@ -828,7 +828,7 @@ class _DeviceSettingWidgetState extends State<DeviceSettingWidget> {
                         ),
                         const Spacer(),
                         Text(
-                            selectedDeviceData != null
+                            selectedDeviceData['lastPosition'] != null
                                 ? convertUTCtoLocal4(
                                     selectedDeviceData['lastPosition'] ?? '')
                                 : "",
@@ -848,7 +848,7 @@ class _DeviceSettingWidgetState extends State<DeviceSettingWidget> {
                         ),
                         const Spacer(),
                         Text(
-                            selectedDeviceData != null
+                            selectedDeviceData['lastConnect'] != null
                                 ? convertUTCtoLocal4(
                                     selectedDeviceData['lastConnect'])
                                 : "",
@@ -927,9 +927,9 @@ class _DeviceSettingWidgetState extends State<DeviceSettingWidget> {
                         ),
                         const Spacer(),
                         Text(
-                            selectedDeviceData != null
+                            selectedDeviceData['speed'] != null
                                 ? '${selectedDeviceData['speed']} mi/h'
-                                : '',
+                                : '0 mi/h',
                             style: TextStyle(
                                 fontSize: dataController.normalTextSize.value))
                       ],
@@ -945,10 +945,7 @@ class _DeviceSettingWidgetState extends State<DeviceSettingWidget> {
                               fontSize: dataController.normalTextSize.value),
                         ),
                         const Spacer(),
-                        Text(
-                            selectedDeviceData != null
-                                ? selectedDeviceData['odometer']
-                                : '',
+                        Text(selectedDeviceData['odometer'] ?? '',
                             style: TextStyle(
                                 fontSize: dataController.normalTextSize.value))
                       ],
