@@ -45,6 +45,7 @@ class ApiConfig {
   static const String userNameList = '/user-name-list';
   static const String deviceMileAgeData = '/get-device-mileage-data';
   static const String userProfile = '/user-profile';
+  static const String deviceNameList = '/device-name-list';
   static const String batchGenerateLinks =
       "/get-batch-generate-links-page-data";
   static const String saveTuroCallLinks = "/links/saveTuroCalLink";

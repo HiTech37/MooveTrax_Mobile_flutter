@@ -156,7 +156,7 @@ class DeviceManageScreenState extends State<DeviceManageScreen> {
         Get.snackbar("Processing", "Please wait.",
             backgroundColor: Colors.yellow,
             colorText: Colors.black,
-            animationDuration: const Duration(milliseconds: 300));
+            animationDuration: const Duration(milliseconds: 30000));
 
         const Duration pollingInterval = Duration(seconds: 30);
         const Duration timeoutDuration = Duration(minutes: 20);
@@ -167,16 +167,26 @@ class DeviceManageScreenState extends State<DeviceManageScreen> {
           if (elapsedTime >= timeoutDuration) {
             timer.cancel();
           }
+          Get.snackbar("Processing", "Please wait.",
+              backgroundColor: Colors.yellow,
+              colorText: Colors.black,
+              animationDuration: const Duration(milliseconds: 30000));
+
           await authController.checkGpsidIccidMatched(deviceData);
-          print("=>${authController.checkGpsidIccidMatchedResult.value}");
+          if (authController.checkGpsidIccidMatchedResult.value['error'] ==
+              null) {
+            Get.toNamed('/home');
+          }
         });
+      } else {
+        timer?.cancel();
       }
     }
     if (deviceController.apiStatus.value == ApiState.failure) {
       setState(() {
         savingDeviceData = false;
       });
-      Get.snackbar("Adding Failed1", deviceController.errorMessage.value,
+      Get.snackbar("Adding Failed", deviceController.errorMessage.value,
           backgroundColor: Colors.red,
           colorText: Colors.white,
           animationDuration: const Duration(milliseconds: 300));

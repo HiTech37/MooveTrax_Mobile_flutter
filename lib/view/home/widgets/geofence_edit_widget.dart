@@ -34,7 +34,6 @@ class _GeoFenceEditWidgetState extends State<GeoFenceEditWidget> {
   String defaultLeaveSubject = '{{Car_Name}} has left {{Fence_name}}';
 
   bool updatingGeoFenceData = false;
-  bool postToTuro = false;
   bool allowEnterNotifyEmail = false;
   bool allowEnterNotifyPush = false;
   bool allowEnterLock = false;
@@ -68,36 +67,56 @@ class _GeoFenceEditWidgetState extends State<GeoFenceEditWidget> {
     initData();
   }
 
-  void initData() async {
-    if (!mounted) return;
-
-    await authController.getUserProfile();
-    final dynamic userData = authController.profileData.value;
-
-    if (userData != null) {
-      final dynamic devices = userData['devices'] ?? [];
-      deviceList.addAll(devices);
-    }
-
+  Future<void> initData() async {
+    await authController.getDeviceList();
+    deviceList = authController.deviceDataList.value;
     if (widget.actionType == "edit") {
       await deviceController
           .getGeoFenceById(dataController.selectedGeoFenceId.value);
       if (deviceController.apiStatus.value == ApiState.success) {
         selectedGeoFenceData = deviceController.selectedGeoFenceData.value;
         geoFenceNameEditController.text = selectedGeoFenceData['name'];
+
+        List<dynamic> deviceIds = selectedGeoFenceData['deviceIds'] ?? [];
         _deviceSelectController.selectedOptions.clear();
-        for (int i = 0; i < selectedGeoFenceData['deviceIds'].length; i++) {
-          List<dynamic> device = deviceList
-              .where((deviceData) =>
-                  deviceData['id'] == selectedGeoFenceData['deviceIds'][i])
+        setState(() {
+          List<ValueItem<dynamic>> options = deviceList
+              .map((device) => ValueItem<dynamic>(
+                    label: device['name'],
+                    value: device,
+                  ))
               .toList();
-          if (device.isNotEmpty) {
-            _deviceSelectController.selectedOptions.add(ValueItem<dynamic>(
-              label: device.first['name'],
-              value: device.first,
-            ));
+          _deviceSelectController.setOptions(options);
+          List<ValueItem<dynamic>> selectedOptions = options
+              .where((item) => deviceIds.contains(item.value['id']))
+              .toList();
+          _deviceSelectController.setSelectedOptions(selectedOptions);
+          allowEnterLock = selectedGeoFenceData['enter_lock_checked'];
+          allowLeaveLock = selectedGeoFenceData['leave_lock_checked'];
+          final int postToTuro = selectedGeoFenceData['post_turo'];
+          if (postToTuro >= 8) {
+            allowEnterNotifyEmail = true;
+          } else {
+            allowEnterNotifyEmail = false;
           }
-        }
+          if ((postToTuro >= 4 && postToTuro < 8) ||
+              (postToTuro >= 12 && postToTuro < 16)) {
+            allowEnterNotifyPush = true;
+          } else {
+            allowEnterNotifyPush = false;
+          }
+          if (postToTuro % 4 == 2 || postToTuro % 4 == 3) {
+            allowLeaveNotifyEmail = true;
+          } else {
+            allowLeaveNotifyEmail = false;
+          }
+          if (postToTuro % 2 == 1) {
+            allowLeaveNotifyPush = true;
+          } else {
+            allowLeaveNotifyPush = false;
+          }
+        });
+
         geoFenceEnterNotifyEmailController.text =
             selectedGeoFenceData['notify_email_enter'];
         geoFenceLeaveNotifyEmailController.text =
@@ -110,18 +129,29 @@ class _GeoFenceEditWidgetState extends State<GeoFenceEditWidget> {
           geoFenceLeaveSubjectController.text =
               selectedGeoFenceData['leave_subject'];
         }
-        postToTuro = selectedGeoFenceData['post_turo'] == 1;
-        if (!mounted) return;
+        enterLockMinsController.text =
+            selectedGeoFenceData['enter_lock_miutes'].toString();
+        leaveLockMinsController.text =
+            selectedGeoFenceData['leave_lock_miutes'].toString();
+
         setState(() {});
       }
     } else if (widget.actionType == "create") {
       _deviceSelectController.selectedOptions.clear();
-      setState(() {});
+      setState(() {
+        _deviceSelectController.setOptions(deviceList
+            .map((value) => ValueItem<dynamic>(
+                  label: value['name'],
+                  value: value,
+                ))
+            .toList());
+      });
     }
   }
 
   @override
   void dispose() {
+    _deviceSelectController.dispose();
     super.dispose();
   }
 
@@ -135,7 +165,7 @@ class _GeoFenceEditWidgetState extends State<GeoFenceEditWidget> {
             horizontal: 15 * dataController.currentScaleFactor.value,
             vertical: 20 * dataController.currentScaleFactor.value),
         child: SingleChildScrollView(
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
+          child: Column(children: [
             Text(
               'Geofence Name',
               style: TextStyle(fontSize: dataController.titleTextSize.value),
@@ -166,58 +196,67 @@ class _GeoFenceEditWidgetState extends State<GeoFenceEditWidget> {
             SizedBox(
               height: 20 * dataController.currentScaleFactor.value,
             ),
-            MultiSelectDropDown<dynamic>(
-              controller: _deviceSelectController,
-              fieldBackgroundColor:
-                  Theme.of(context).brightness == Brightness.dark
-                      ? Colors.black54
-                      : const Color.fromARGB(255, 231, 227, 227),
-              clearIcon: const Icon(Icons.delete),
-              onOptionSelected: (options) {},
-              dropdownBackgroundColor:
-                  Theme.of(context).brightness == Brightness.dark
-                      ? Colors.black
-                      : Colors.grey[200],
-              borderRadius: 5,
-              hintStyle:
-                  TextStyle(fontSize: dataController.normalTextSize.value),
-              options: deviceList.map<ValueItem<dynamic>>((dynamic value) {
-                return ValueItem<dynamic>(
-                  label: value['name'],
-                  value: value,
-                );
-              }).toList(),
-              singleSelectItemStyle: TextStyle(
-                  fontSize: dataController.normalTextSize.value,
-                  fontWeight: FontWeight.bold),
-              chipConfig: const ChipConfig(
-                  wrapType: WrapType.wrap, backgroundColor: Colors.green),
-              optionTextStyle:
-                  TextStyle(fontSize: dataController.normalTextSize.value),
-              selectedOptionIcon: Icon(
-                Icons.check_circle,
-                color: Colors.green,
-                size: dataController.iconSize.value,
+            Material(
+              child: MultiSelectDropDown<dynamic>(
+                controller: _deviceSelectController,
+                fieldBackgroundColor:
+                    Theme.of(context).brightness == Brightness.dark
+                        ? Colors.black54
+                        : const Color.fromARGB(255, 231, 227, 227),
+                clearIcon: const Icon(Icons.delete),
+                onOptionSelected: (options) {},
+                dropdownBackgroundColor:
+                    Theme.of(context).brightness == Brightness.dark
+                        ? Colors.black
+                        : Colors.grey[200],
+                borderRadius: 5,
+                hintStyle:
+                    TextStyle(fontSize: dataController.normalTextSize.value),
+                options: deviceList.map((dynamic value) {
+                  return ValueItem<dynamic>(
+                    label: value['name'],
+                    value: value,
+                  );
+                }).toList(),
+                singleSelectItemStyle: TextStyle(
+                    fontSize: dataController.normalTextSize.value,
+                    fontWeight: FontWeight.bold),
+                chipConfig: const ChipConfig(
+                    wrapType: WrapType.wrap, backgroundColor: Colors.green),
+                optionTextStyle:
+                    TextStyle(fontSize: dataController.normalTextSize.value),
+                selectedOptionIcon: Icon(
+                  Icons.check_circle,
+                  color: Colors.green,
+                  size: dataController.iconSize.value,
+                ),
+                selectedOptionTextColor: Colors.blue,
+                dropdownMargin: 2,
+                onOptionRemoved: (index, option) {
+                  print("Removed: $option");
+                },
+                optionBuilder: (context, valueItem, isSelected) {
+                  return ListTile(
+                    title: Text(valueItem.label,
+                        style: TextStyle(
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.white
+                                    : Colors.black,
+                            fontSize: dataController.normalTextSize.value)),
+                    trailing: isSelected
+                        ? Icon(
+                            Icons.check_circle,
+                            size: dataController.iconSize.value,
+                            color: Colors.green,
+                          )
+                        : Icon(
+                            Icons.radio_button_unchecked,
+                            size: dataController.iconSize.value,
+                          ),
+                  );
+                },
               ),
-              selectedOptionTextColor: Colors.blue,
-              dropdownMargin: 2,
-              onOptionRemoved: (index, option) {},
-              optionBuilder: (context, valueItem, isSelected) {
-                return ListTile(
-                  title: Text(valueItem.label,
-                      style: TextStyle(
-                          fontSize: dataController.normalTextSize.value)),
-                  trailing: isSelected
-                      ? Icon(
-                          Icons.check_circle,
-                          size: dataController.iconSize.value,
-                        )
-                      : Icon(
-                          Icons.radio_button_unchecked,
-                          size: dataController.iconSize.value,
-                        ),
-                );
-              },
             ),
             SizedBox(
               height: 20 * dataController.currentScaleFactor.value,
@@ -535,44 +574,46 @@ class _GeoFenceEditWidgetState extends State<GeoFenceEditWidget> {
                   onPressed: () async {
                     selectedGeoFenceData['name'] =
                         geoFenceNameEditController.text;
-                    selectedGeoFenceData['post_turo'] = postToTuro;
-                    selectedGeoFenceData['notify_email_enter'] =
-                        geoFenceEnterNotifyEmailController.text;
+                    final String enterE = allowEnterNotifyEmail ? "1" : "0";
+                    final String enterP = allowEnterNotifyPush ? "1" : "0";
+                    final String leaveE = allowLeaveNotifyEmail ? "1" : "0";
+                    final String leaveP = allowLeaveNotifyPush ? "1" : "0";
+
+                    selectedGeoFenceData['post_turo'] =
+                        int.parse(enterE + enterP + leaveE + leaveP, radix: 2);
                     selectedGeoFenceData['allow_notify_email_enter'] =
                         allowEnterNotifyEmail;
-                    selectedGeoFenceData['notify_email_leave'] =
-                        geoFenceLeaveNotifyEmailController.text;
                     selectedGeoFenceData['allow_notify_email_leave'] =
                         allowLeaveNotifyEmail;
-                    selectedGeoFenceData['leave_subject'] =
-                        geoFenceLeaveSubjectController.text;
-                    selectedGeoFenceData['enter_subject'] =
-                        geoFenceEnterSubjectController.text;
                     selectedGeoFenceData['allow_notify_push_enter'] =
                         allowEnterNotifyPush;
                     selectedGeoFenceData['allow_notify_push_leave'] =
                         allowLeaveNotifyPush;
-                    selectedGeoFenceData['allow_lock_enter'] = allowEnterLock;
-                    selectedGeoFenceData['allow_lock_leave'] = allowLeaveLock;
-                    selectedGeoFenceData['lock_mins_enter'] =
+                    selectedGeoFenceData['notify_email_enter'] =
+                        geoFenceEnterNotifyEmailController.text;
+                    selectedGeoFenceData['notify_email_leave'] =
+                        geoFenceLeaveNotifyEmailController.text;
+                    selectedGeoFenceData['leave_subject'] =
+                        geoFenceLeaveSubjectController.text;
+                    selectedGeoFenceData['enter_subject'] =
+                        geoFenceEnterSubjectController.text;
+                    selectedGeoFenceData['enter_lock_checked'] = allowEnterLock;
+                    selectedGeoFenceData['leave_lock_checked'] = allowLeaveLock;
+                    selectedGeoFenceData['enter_lock_miutes'] =
                         int.parse(enterLockMinsController.text);
-                    selectedGeoFenceData['lock_mins_leave'] =
+                    selectedGeoFenceData['leave_lock_miutes'] =
                         int.parse(leaveLockMinsController.text);
 
-                    if (_deviceSelectController.selectedOptions.isEmpty) {
-                      selectedGeoFenceData['deviceIds'] = [];
-                    }
-                    for (int i = 0;
-                        i < _deviceSelectController.selectedOptions.length;
-                        i++) {
-                      selectedGeoFenceData['deviceIds'].add(
-                          _deviceSelectController
-                              .selectedOptions[i].value['id']);
+                    selectedGeoFenceData['deviceIds'] = [];
+                    for (var option
+                        in _deviceSelectController.selectedOptions) {
+                      selectedGeoFenceData['deviceIds'].add(option.value['id']);
                     }
                     setState(() {
                       updatingGeoFenceData = true;
                     });
                     if (widget.actionType == 'edit') {
+                      print("=>${selectedGeoFenceData['deviceIds']}");
                       await deviceController.updateSelectedGeoFenceById(
                           dataController.selectedGeoFenceId.value,
                           selectedGeoFenceData);
@@ -580,7 +621,7 @@ class _GeoFenceEditWidgetState extends State<GeoFenceEditWidget> {
                       selectedGeoFenceData['userId'] =
                           authController.storageUserData?['id'];
                       selectedGeoFenceData['area'] = widget.geofenceArea;
-                      selectedGeoFenceData['coocoordinatesrdi'] =
+                      selectedGeoFenceData['coordinates'] =
                           widget.geofenceCoordinates;
                       await deviceController
                           .createGeoFence(selectedGeoFenceData);

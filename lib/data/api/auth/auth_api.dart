@@ -110,6 +110,23 @@ class AuthApi {
     }
   }
 
+  Future<dynamic> getDeviceList() async {
+    try {
+      final Response response = await dioClient.dio.get(
+        ApiConfig.deviceNameList,
+      );
+      if (response.statusCode.success) {
+        return response.data;
+      } else {
+        throw DioExceptions;
+      }
+    } catch (error) {
+      if (kDebugMode) {
+        print(error);
+      }
+    }
+  }
+
   Future<dynamic> getTeslaSignupUri() async {
     try {
       final Response response = await dioClient.dio.get(

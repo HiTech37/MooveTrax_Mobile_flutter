@@ -7,6 +7,7 @@ import 'package:moovetrax/common/widget/youtube_player.dart';
 import 'package:moovetrax/core/common.dart';
 import 'package:moovetrax/data/api/payment/payment_api.dart';
 import 'package:moovetrax/di.dart';
+import 'package:moovetrax/view/account/widget/escrow_widget.dart';
 import 'package:moovetrax/viewmodel/auth/controller/auth_controller.dart';
 import 'package:moovetrax/viewmodel/data_controller.dart';
 import 'package:moovetrax/viewmodel/device/controller/device_controller.dart';
@@ -455,10 +456,53 @@ class _CreditBalanceWidgetState extends State<CreditBalanceWidget>
                                   }
                                 }
                               },
-                              child: Text(
-                                'Pay from\n Escrow ($escrowBalance)',
-                                style: TextStyle(
-                                  fontSize: dataController.normalTextSize.value,
+                              child: RichText(
+                                text: TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: 'Pay from\n Escrow (',
+                                      style: TextStyle(
+                                        fontSize:
+                                            dataController.normalTextSize.value,
+                                        color: Colors
+                                            .black, // Adjust color as needed
+                                      ),
+                                    ),
+                                    WidgetSpan(
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          Get.dialog(Dialog(
+                                              insetPadding:
+                                                  const EdgeInsets.all(10),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(
+                                                    10.0), // Set the border radius
+                                              ),
+                                              child: const EscrowWidget()));
+                                        },
+                                        child: Text(
+                                          escrowBalance,
+                                          style: TextStyle(
+                                            fontSize: dataController
+                                                .normalTextSize.value,
+                                            color: Colors
+                                                .blue, // Indicate it's clickable
+                                            decoration: TextDecoration
+                                                .underline, // Optional for UX
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: ')',
+                                      style: TextStyle(
+                                        fontSize:
+                                            dataController.normalTextSize.value,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               )),
                         ],

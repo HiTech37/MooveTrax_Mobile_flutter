@@ -17,6 +17,7 @@ class AuthController extends GetxController
   Rx<dynamic> checkInstallerDeviceResult = Rx<dynamic>(null);
   Rx<dynamic> checkGpsidIccidMatchedResult = Rx<dynamic>(null);
   Rx<dynamic> profileData = Rx<dynamic>(null);
+  Rx<dynamic> deviceDataList = Rx<dynamic>(null);
   Rx<dynamic> teslaSignupUri = Rx<dynamic>(null);
   Rx<dynamic> smartcarSignupUri = Rx<dynamic>(null);
   Rx<dynamic> userEscrowCarBalance = Rx<dynamic>(null);
@@ -142,6 +143,23 @@ class AuthController extends GetxController
       },
       (dynamic data) {
         profileData.value = data;
+        apiStatus.value = ApiState.success;
+        errorMessage.value = '';
+      },
+    );
+  }
+
+  Future<void> getDeviceList() async {
+    apiStatus.value = ApiState.loading;
+    Either<String, dynamic> failureOrSuccess =
+        await authRepository.getDeviceList();
+    failureOrSuccess.fold(
+      (String failure) {
+        apiStatus.value = ApiState.failure;
+        errorMessage.value = failure;
+      },
+      (dynamic data) {
+        deviceDataList.value = data;
         apiStatus.value = ApiState.success;
         errorMessage.value = '';
       },

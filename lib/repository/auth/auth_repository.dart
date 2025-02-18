@@ -69,6 +69,10 @@ class AuthRepository {
     return checkItemDataFailOrSuccess(authApi.getUserProfile());
   }
 
+  Future<Either<String, dynamic>> getDeviceList() async {
+    return checkItemDataFailOrSuccess(authApi.getDeviceList());
+  }
+
   Future<Either<String, dynamic>> getTeslaSignupUri() async {
     return checkItemDataFailOrSuccess(authApi.getTeslaSignupUri());
   }

@@ -121,13 +121,19 @@ class EscrowWidgetState extends State<EscrowWidget> {
                       Text(
                         'Added By:',
                         style: TextStyle(
-                            fontSize: dataController.normalTextSize.value),
+                          fontSize: dataController.normalTextSize.value,
+                        ),
                       ),
-                      Text(
-                        logData['from_name'],
-                        style: TextStyle(
+                      Flexible(
+                        child: Text(
+                          logData['from_name'],
+                          style: TextStyle(
                             fontSize: dataController.normalTextSize.value,
-                            fontWeight: FontWeight.w600),
+                            fontWeight: FontWeight.w600,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
                       ),
                     ],
                   ),

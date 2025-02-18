@@ -358,230 +358,244 @@ class _DeviceSettingWidgetState extends State<DeviceSettingWidget> {
             SizedBox(
               height: 30 * dataController.currentScaleFactor.value,
             ),
-            ListTile(
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
-              onTap: () async {
-                await deviceController.sendCommand({
-                  'command': 'Unlock',
-                  'userId': authController.storageUserData?['id'],
-                  'deviceId': dataController.currentDeviceId.value
-                });
+            if (selectedDeviceData['deviceType'].toString() != "usb")
+              ListTile(
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                onTap: () async {
+                  await deviceController.sendCommand({
+                    'command': 'Unlock',
+                    'userId': authController.storageUserData?['id'],
+                    'deviceId': dataController.currentDeviceId.value
+                  });
 
-                Get.back();
-                if (deviceController.apiStatus.value == ApiState.success) {
-                  Get.snackbar("Command", "Sent Command.",
-                      backgroundColor: Colors.green,
-                      colorText: Colors.white,
-                      animationDuration: const Duration(milliseconds: 300));
-                }
-              },
-              title: Text(
-                'Unlock',
-                style: TextStyle(
-                    fontSize: dataController.normalTextSize.value,
-                    fontWeight: FontWeight.w500),
-              ),
-              subtitle: Text(
-                lastUnlockCommandDate,
-                style: TextStyle(fontSize: dataController.smallTextSize.value),
-              ),
-              trailing: Icon(
-                unlockStatus ? Icons.done_all : Icons.check,
-                size: dataController.iconSize.value,
-                color: unlockStatus ? Colors.green : Colors.grey[600],
-              ),
-            ),
-            ListTile(
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
-              onTap: () async {
-                await deviceController.sendCommand({
-                  'command': 'Lock',
-                  'userId': authController.storageUserData?['id'],
-                  'deviceId': dataController.currentDeviceId.value
-                });
-                Get.back();
-
-                if (deviceController.apiStatus.value == ApiState.success) {
-                  Get.snackbar("Command", "Sent Command.",
-                      backgroundColor: Colors.green,
-                      colorText: Colors.white,
-                      animationDuration: const Duration(milliseconds: 300));
-                }
-              },
-              title: Text(
-                'Lock',
-                style: TextStyle(
-                    fontSize: dataController.normalTextSize.value,
-                    fontWeight: FontWeight.w500),
-              ),
-              subtitle: Text(
-                lastLockCommandDate,
-                style: TextStyle(fontSize: dataController.smallTextSize.value),
-              ),
-              trailing: Icon(lockStatus ? Icons.done_all : Icons.check,
+                  Get.back();
+                  if (deviceController.apiStatus.value == ApiState.success) {
+                    Get.snackbar("Command", "Sent Command.",
+                        backgroundColor: Colors.green,
+                        colorText: Colors.white,
+                        animationDuration: const Duration(milliseconds: 300));
+                  }
+                },
+                title: Text(
+                  'Unlock',
+                  style: TextStyle(
+                      fontSize: dataController.normalTextSize.value,
+                      fontWeight: FontWeight.w500),
+                ),
+                subtitle: Text(
+                  lastUnlockCommandDate,
+                  style:
+                      TextStyle(fontSize: dataController.smallTextSize.value),
+                ),
+                trailing: Icon(
+                  unlockStatus ? Icons.done_all : Icons.check,
                   size: dataController.iconSize.value,
-                  color: lockStatus ? Colors.green : Colors.grey[600]),
-            ),
-            ListTile(
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
-              onTap: () async {
-                await deviceController.sendCommand({
-                  'command': 'Horn',
-                  'userId': authController.storageUserData?['id'],
-                  'deviceId': dataController.currentDeviceId.value
-                });
-                Get.back();
+                  color: unlockStatus ? Colors.green : Colors.grey[600],
+                ),
+              ),
+            if (selectedDeviceData['deviceType'].toString() != "usb")
+              ListTile(
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                onTap: () async {
+                  await deviceController.sendCommand({
+                    'command': 'Lock',
+                    'userId': authController.storageUserData?['id'],
+                    'deviceId': dataController.currentDeviceId.value
+                  });
+                  Get.back();
 
-                if (deviceController.apiStatus.value == ApiState.success) {
-                  Get.snackbar("Command", "Sent Command.",
-                      backgroundColor: Colors.green,
-                      colorText: Colors.white,
-                      animationDuration: const Duration(milliseconds: 300));
-                }
-              },
-              title: Text(
-                'Horn',
-                style: TextStyle(
-                    fontSize: dataController.normalTextSize.value,
-                    fontWeight: FontWeight.w500),
+                  if (deviceController.apiStatus.value == ApiState.success) {
+                    Get.snackbar("Command", "Sent Command.",
+                        backgroundColor: Colors.green,
+                        colorText: Colors.white,
+                        animationDuration: const Duration(milliseconds: 300));
+                  }
+                },
+                title: Text(
+                  'Lock',
+                  style: TextStyle(
+                      fontSize: dataController.normalTextSize.value,
+                      fontWeight: FontWeight.w500),
+                ),
+                subtitle: Text(
+                  lastLockCommandDate,
+                  style:
+                      TextStyle(fontSize: dataController.smallTextSize.value),
+                ),
+                trailing: Icon(lockStatus ? Icons.done_all : Icons.check,
+                    size: dataController.iconSize.value,
+                    color: lockStatus ? Colors.green : Colors.grey[600]),
               ),
-              subtitle: Text(
-                lastHornCommandDate,
-                style: TextStyle(fontSize: dataController.smallTextSize.value),
+            if (selectedDeviceData['deviceType'].toString() != "usb")
+              ListTile(
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                onTap: () async {
+                  await deviceController.sendCommand({
+                    'command': 'Horn',
+                    'userId': authController.storageUserData?['id'],
+                    'deviceId': dataController.currentDeviceId.value
+                  });
+                  Get.back();
+
+                  if (deviceController.apiStatus.value == ApiState.success) {
+                    Get.snackbar("Command", "Sent Command.",
+                        backgroundColor: Colors.green,
+                        colorText: Colors.white,
+                        animationDuration: const Duration(milliseconds: 300));
+                  }
+                },
+                title: Text(
+                  'Horn',
+                  style: TextStyle(
+                      fontSize: dataController.normalTextSize.value,
+                      fontWeight: FontWeight.w500),
+                ),
+                subtitle: Text(
+                  lastHornCommandDate,
+                  style:
+                      TextStyle(fontSize: dataController.smallTextSize.value),
+                ),
+                trailing: Icon(hornStatus ? Icons.done_all : Icons.check,
+                    size: dataController.iconSize.value,
+                    color: hornStatus ? Colors.green : Colors.grey[600]),
               ),
-              trailing: Icon(hornStatus ? Icons.done_all : Icons.check,
-                  size: dataController.iconSize.value,
-                  color: hornStatus ? Colors.green : Colors.grey[600]),
-            ),
-            ListTile(
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
-              onTap: () async {
-                bool confirm = await showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: const Text("Unkill"),
-                        content: const Text("Are you sure?"),
-                        actions: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              InkWell(
-                                onTap: () {
-                                  Navigator.of(context).pop(false);
-                                },
-                                child: const Text("No"),
-                              ),
-                              const Spacer(),
-                              InkWell(
-                                onTap: () {
-                                  Navigator.of(context).pop(true);
-                                },
-                                child: const Text(
-                                  "Yes",
-                                  style: TextStyle(color: Colors.red),
+            if (selectedDeviceData['deviceType'].toString() != "smartcar" &&
+                selectedDeviceData['deviceType'].toString() != "tesla" &&
+                selectedDeviceData['deviceType'].toString() != "usb")
+              ListTile(
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                onTap: () async {
+                  bool confirm = await showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text("Unkill"),
+                          content: const Text("Are you sure?"),
+                          actions: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                InkWell(
+                                  onTap: () {
+                                    Navigator.of(context).pop(false);
+                                  },
+                                  child: const Text("No"),
                                 ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      );
-                    });
-                if (!confirm) return;
-                await deviceController.sendCommand({
-                  'command': 'Unkill',
-                  'userId': authController.storageUserData?['id'],
-                  'deviceId': dataController.currentDeviceId.value
-                });
-                Get.back();
-                if (deviceController.apiStatus.value == ApiState.success) {
-                  Get.snackbar("Command", "Sent Command.",
-                      backgroundColor: Colors.green,
-                      colorText: Colors.white,
-                      animationDuration: const Duration(milliseconds: 300));
-                }
-              },
-              trailing: Icon(unkillStatus ? Icons.done_all : Icons.check,
-                  size: dataController.iconSize.value,
-                  color: unkillStatus ? Colors.green : Colors.grey[600]),
-              title: Text(
-                'Unkill',
-                style: TextStyle(
-                    fontSize: dataController.normalTextSize.value,
-                    fontWeight: FontWeight.w500),
-              ),
-              subtitle: Text(
-                lastUnkillCommandDate,
-                style: TextStyle(fontSize: dataController.smallTextSize.value),
-              ),
-            ),
-            ListTile(
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
-              onTap: () async {
-                bool confirm = await showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: const Text("Kill"),
-                        content: const Text("Are you sure?"),
-                        actions: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              InkWell(
-                                onTap: () {
-                                  Navigator.of(context).pop(false);
-                                },
-                                child: const Text("No"),
-                              ),
-                              const Spacer(),
-                              InkWell(
-                                onTap: () {
-                                  Navigator.of(context).pop(true);
-                                },
-                                child: const Text(
-                                  "Yes",
-                                  style: TextStyle(color: Colors.red),
+                                const Spacer(),
+                                InkWell(
+                                  onTap: () {
+                                    Navigator.of(context).pop(true);
+                                  },
+                                  child: const Text(
+                                    "Yes",
+                                    style: TextStyle(color: Colors.red),
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      );
-                    });
-                if (!confirm) return;
-                await deviceController.sendCommand({
-                  'command': 'Kill',
-                  'userId': authController.storageUserData?['id'],
-                  'deviceId': dataController.currentDeviceId.value
-                });
-                Get.back();
-                if (deviceController.apiStatus.value == ApiState.success) {
-                  Get.snackbar("Command", "Sent Command.",
-                      backgroundColor: Colors.green,
-                      colorText: Colors.white,
-                      animationDuration: const Duration(milliseconds: 300));
-                }
-              },
-              trailing: Icon(killStatus ? Icons.done_all : Icons.check,
-                  size: dataController.iconSize.value,
-                  color: killStatus ? Colors.green : Colors.grey[600]),
-              title: Text(
-                'Kill',
-                style: TextStyle(
-                    fontSize: dataController.normalTextSize.value,
-                    fontWeight: FontWeight.w500),
+                              ],
+                            ),
+                          ],
+                        );
+                      });
+                  if (!confirm) return;
+                  await deviceController.sendCommand({
+                    'command': 'Unkill',
+                    'userId': authController.storageUserData?['id'],
+                    'deviceId': dataController.currentDeviceId.value
+                  });
+                  Get.back();
+                  if (deviceController.apiStatus.value == ApiState.success) {
+                    Get.snackbar("Command", "Sent Command.",
+                        backgroundColor: Colors.green,
+                        colorText: Colors.white,
+                        animationDuration: const Duration(milliseconds: 300));
+                  }
+                },
+                trailing: Icon(unkillStatus ? Icons.done_all : Icons.check,
+                    size: dataController.iconSize.value,
+                    color: unkillStatus ? Colors.green : Colors.grey[600]),
+                title: Text(
+                  'Unkill',
+                  style: TextStyle(
+                      fontSize: dataController.normalTextSize.value,
+                      fontWeight: FontWeight.w500),
+                ),
+                subtitle: Text(
+                  lastUnkillCommandDate,
+                  style:
+                      TextStyle(fontSize: dataController.smallTextSize.value),
+                ),
               ),
-              subtitle: Text(
-                lastKillCommandDate,
-                style: TextStyle(fontSize: dataController.smallTextSize.value),
+            if (selectedDeviceData['deviceType'].toString() != "smartcar" &&
+                selectedDeviceData['deviceType'].toString() != "tesla" &&
+                selectedDeviceData['deviceType'].toString() != "usb")
+              ListTile(
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                onTap: () async {
+                  bool confirm = await showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text("Kill"),
+                          content: const Text("Are you sure?"),
+                          actions: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                InkWell(
+                                  onTap: () {
+                                    Navigator.of(context).pop(false);
+                                  },
+                                  child: const Text("No"),
+                                ),
+                                const Spacer(),
+                                InkWell(
+                                  onTap: () {
+                                    Navigator.of(context).pop(true);
+                                  },
+                                  child: const Text(
+                                    "Yes",
+                                    style: TextStyle(color: Colors.red),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        );
+                      });
+                  if (!confirm) return;
+                  await deviceController.sendCommand({
+                    'command': 'Kill',
+                    'userId': authController.storageUserData?['id'],
+                    'deviceId': dataController.currentDeviceId.value
+                  });
+                  Get.back();
+                  if (deviceController.apiStatus.value == ApiState.success) {
+                    Get.snackbar("Command", "Sent Command.",
+                        backgroundColor: Colors.green,
+                        colorText: Colors.white,
+                        animationDuration: const Duration(milliseconds: 300));
+                  }
+                },
+                trailing: Icon(killStatus ? Icons.done_all : Icons.check,
+                    size: dataController.iconSize.value,
+                    color: killStatus ? Colors.green : Colors.grey[600]),
+                title: Text(
+                  'Kill',
+                  style: TextStyle(
+                      fontSize: dataController.normalTextSize.value,
+                      fontWeight: FontWeight.w500),
+                ),
+                subtitle: Text(
+                  lastKillCommandDate,
+                  style:
+                      TextStyle(fontSize: dataController.smallTextSize.value),
+                ),
               ),
-            ),
             ListTile(
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
@@ -629,7 +643,8 @@ class _DeviceSettingWidgetState extends State<DeviceSettingWidget> {
                     fontWeight: FontWeight.w500),
               ),
             ),
-            if (selectedDeviceData['uniqueId'].toString().startsWith('MT3V'))
+            if (selectedDeviceData['uniqueId'].toString().startsWith('MT3V') &&
+                selectedDeviceData['deviceType'].toString() != "usb")
               ListTile(
                 onTap: () async {
                   dynamic deviceData = selectedDeviceData;
@@ -663,7 +678,8 @@ class _DeviceSettingWidgetState extends State<DeviceSettingWidget> {
                       fontWeight: FontWeight.w500),
                 ),
               ),
-            if (selectedDeviceData['uniqueId'].toString().startsWith('MT3V'))
+            if (selectedDeviceData['uniqueId'].toString().startsWith('MT3V') &&
+                selectedDeviceData['deviceType'].toString() != "usb")
               ListTile(
                 onTap: () async {
                   dynamic deviceData = selectedDeviceData;
