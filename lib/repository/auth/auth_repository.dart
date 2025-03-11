@@ -44,6 +44,12 @@ class AuthRepository {
     return checkItemDataFailOrSuccess(authApi.checkGpsidIccidMatched(data));
   }
 
+  Future<Either<String, dynamic>> checkGpsidIccidMatchedForInstaller(
+      dynamic data) async {
+    return checkItemDataFailOrSuccess(
+        authApi.checkGpsidIccidMatchedForInstaller(data));
+  }
+
   Future<Either<String, dynamic>> checkInstallerDevice(
       dynamic deviceInfo) async {
     return checkItemDataFailOrSuccess(authApi.checkInstallerDevice(deviceInfo));

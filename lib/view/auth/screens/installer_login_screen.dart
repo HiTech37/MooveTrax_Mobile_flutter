@@ -61,7 +61,7 @@ class InstallerLoginScreenState extends State<InstallerLoginScreen> {
             .sendInstallerAuthEmail({"token": authController.installerKey});
         Get.toNamed('/installer-home');
       }
-      await authController.checkGpsidIccidMatched({
+      await authController.checkGpsidIccidMatchedForInstaller({
         "iccid_prefix": selectedIccID,
         "iccid": iccID,
         "is_final": 0,
@@ -390,7 +390,7 @@ class InstallerLoginScreenState extends State<InstallerLoginScreen> {
                                             animationDuration: const Duration(
                                                 microseconds: 300));
                                         await authController
-                                            .checkGpsidIccidMatched({
+                                            .checkGpsidIccidMatchedForInstaller({
                                           "iccid_prefix": selectedIccID,
                                           "iccid": iccID,
                                           "is_final": 0,
@@ -399,6 +399,7 @@ class InstallerLoginScreenState extends State<InstallerLoginScreen> {
                                           "session": sessionCreated,
                                           "mobile_installer": "0"
                                         });
+
                                         checkGpsidIccidMatched();
                                       }
                                     }

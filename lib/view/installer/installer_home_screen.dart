@@ -24,8 +24,15 @@ class InstallerHomeScreenState extends State<InstallerHomeScreen> {
   final AuthController authController = getIt<AuthController>();
   final DeviceController deviceController = getIt<DeviceController>();
   final DataController dataController = Get.find<DataController>();
-  TextEditingController carOwnerEditController =
+  TextEditingController carOwnerEmailController =
       TextEditingController(text: '');
+  TextEditingController licensePlateController =
+      TextEditingController(text: '');
+  TextEditingController vinController = TextEditingController(text: '');
+
+  final RegExp emailRegex =
+      RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
+
   bool showAdvance = false;
   LockUnlockOption lockOption = LockUnlockOption.single;
   LockUnlockOption unlockOption = LockUnlockOption.single;
@@ -42,6 +49,10 @@ class InstallerHomeScreenState extends State<InstallerHomeScreen> {
 
   void _cancelTimer() {
     _timer?.cancel(); // Cancel the timer if it's running
+  }
+
+  bool isValidEmail(String email) {
+    return emailRegex.hasMatch(email);
   }
 
   Future<void> initData() async {
@@ -111,7 +122,9 @@ class InstallerHomeScreenState extends State<InstallerHomeScreen> {
               icon: const Icon(Icons.close))
         ],
       ),
-      body: installerDeviceData == null || installerCommandDetails == null
+      body: installerDeviceData == null ||
+              installerCommandDetails == null ||
+              installerCommandDetails == {}
           ? const Center(
               child: CircularProgressIndicator(),
             )
@@ -754,7 +767,9 @@ class InstallerHomeScreenState extends State<InstallerHomeScreen> {
                                       color: Colors.black87),
                                 ),
                                 Text(
-                                  installerCommandDetails != null
+                                  installerCommandDetails != {} &&
+                                          installerCommandDetails['Unlock'] !=
+                                              null
                                       ? convertUTCtoLocal4(
                                           installerCommandDetails['Unlock']
                                               ['updatedAt'])
@@ -768,9 +783,10 @@ class InstallerHomeScreenState extends State<InstallerHomeScreen> {
                           Icon(
                             Icons.check,
                             size: 30 * dataController.currentScaleFactor.value,
-                            color: installerCommandDetails['Unlock']
-                                        ['status'] ==
-                                    'success'
+                            color: installerCommandDetails['Unlock'] != null &&
+                                    installerCommandDetails['Unlock']
+                                            ['status'] ==
+                                        'success'
                                 ? const Color.fromARGB(255, 1, 99, 4)
                                 : Colors.grey,
                           )
@@ -821,7 +837,12 @@ class InstallerHomeScreenState extends State<InstallerHomeScreen> {
                                       color: Colors.black87),
                                 ),
                                 Text(
-                                  installerCommandDetails != null
+                                  installerCommandDetails != null &&
+                                          installerCommandDetails['Lock'] !=
+                                              null &&
+                                          installerCommandDetails['Lock']
+                                                  ['updatedAt'] !=
+                                              null
                                       ? convertUTCtoLocal4(
                                           installerCommandDetails['Lock']
                                               ['updatedAt'])
@@ -835,8 +856,9 @@ class InstallerHomeScreenState extends State<InstallerHomeScreen> {
                           Icon(
                             Icons.check,
                             size: 30 * dataController.currentScaleFactor.value,
-                            color: installerCommandDetails['Lock']['status'] ==
-                                    'success'
+                            color: installerCommandDetails['Lock'] != null &&
+                                    installerCommandDetails['Lock']['status'] ==
+                                        'success'
                                 ? const Color.fromARGB(255, 1, 99, 4)
                                 : Colors.grey,
                           )
@@ -887,7 +909,13 @@ class InstallerHomeScreenState extends State<InstallerHomeScreen> {
                                       color: Colors.black87),
                                 ),
                                 Text(
-                                  installerCommandDetails != null
+                                  installerCommandDetails != null &&
+                                          installerCommandDetails[
+                                                  'LightHorn'] !=
+                                              null &&
+                                          installerCommandDetails['LightHorn']
+                                                  ['updatedAt'] !=
+                                              null
                                       ? convertUTCtoLocal4(
                                           installerCommandDetails['LightHorn']
                                               ['updatedAt'])
@@ -901,11 +929,13 @@ class InstallerHomeScreenState extends State<InstallerHomeScreen> {
                           Icon(
                             Icons.check,
                             size: 30 * dataController.currentScaleFactor.value,
-                            color: installerCommandDetails['LightHorn']
-                                        ['status'] ==
-                                    'success'
-                                ? const Color.fromARGB(255, 1, 99, 4)
-                                : Colors.grey,
+                            color:
+                                installerCommandDetails['LightHorn'] != null &&
+                                        installerCommandDetails['LightHorn']
+                                                ['status'] ==
+                                            'success'
+                                    ? const Color.fromARGB(255, 1, 99, 4)
+                                    : Colors.grey,
                           )
                         ],
                       )),
@@ -954,7 +984,12 @@ class InstallerHomeScreenState extends State<InstallerHomeScreen> {
                                       color: Colors.black87),
                                 ),
                                 Text(
-                                  installerCommandDetails != null
+                                  installerCommandDetails != null &&
+                                          installerCommandDetails['Unkill'] !=
+                                              null &&
+                                          installerCommandDetails['Unkill']
+                                                  ['updatedAt'] !=
+                                              null
                                       ? convertUTCtoLocal4(
                                           installerCommandDetails['Unkill']
                                               ['updatedAt'])
@@ -968,9 +1003,10 @@ class InstallerHomeScreenState extends State<InstallerHomeScreen> {
                           Icon(
                             Icons.check,
                             size: 30 * dataController.currentScaleFactor.value,
-                            color: installerCommandDetails['Unkill']
-                                        ['status'] ==
-                                    'success'
+                            color: installerCommandDetails['Unkill'] != null &&
+                                    installerCommandDetails['Unkill']
+                                            ['status'] ==
+                                        'success'
                                 ? const Color.fromARGB(255, 1, 99, 4)
                                 : Colors.grey,
                           )
@@ -1021,7 +1057,12 @@ class InstallerHomeScreenState extends State<InstallerHomeScreen> {
                                       color: Colors.black87),
                                 ),
                                 Text(
-                                  installerCommandDetails != null
+                                  installerCommandDetails != null &&
+                                          installerCommandDetails['Kill'] !=
+                                              null &&
+                                          installerCommandDetails['Kill']
+                                                  ['updatedAt'] !=
+                                              null
                                       ? convertUTCtoLocal4(
                                           installerCommandDetails['Kill']
                                               ['updatedAt'])
@@ -1035,8 +1076,9 @@ class InstallerHomeScreenState extends State<InstallerHomeScreen> {
                           Icon(
                             Icons.check,
                             size: 30 * dataController.currentScaleFactor.value,
-                            color: installerCommandDetails['Kill']['status'] ==
-                                    'success'
+                            color: installerCommandDetails['Kill'] != null &&
+                                    installerCommandDetails['Kill']['status'] ==
+                                        'success'
                                 ? const Color.fromARGB(255, 1, 99, 4)
                                 : Colors.grey,
                           )
@@ -1065,8 +1107,11 @@ class InstallerHomeScreenState extends State<InstallerHomeScreen> {
                                         .toString());
                                 dataController.setOneTimePaymentAmountValue(
                                     installerDeviceData['device']['credit']);
-                                dataController.setInstallerPaymentUserId(
-                                    installerDeviceData['device']['userId']);
+                                if (installerDeviceData['device']['userId'] !=
+                                    null) {
+                                  dataController.setInstallerPaymentUserId(
+                                      installerDeviceData['device']['userId']);
+                                }
                                 _cancelTimer();
                                 Get.toNamed('/installer-payment');
                               }
@@ -1240,8 +1285,54 @@ class InstallerHomeScreenState extends State<InstallerHomeScreen> {
                       ],
                     ),
                   SizedBox(
-                    height: 30 * dataController.currentScaleFactor.value,
+                    height: 20 * dataController.currentScaleFactor.value,
                   ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'License Plate',
+                        style: TextStyle(
+                            fontSize: dataController.titleTextSize.value),
+                      ),
+                      const SizedBox(width: 5),
+                      SizedBox(
+                        width: 200, // Set the fixed width
+                        child: TextField(
+                          onChanged: (value) {},
+                          controller: licensePlateController,
+                          style: TextStyle(
+                              fontSize: dataController.normalTextSize.value),
+                          decoration: const InputDecoration(hintText: ""),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                      height: 20 * dataController.currentScaleFactor.value),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'VIN',
+                        style: TextStyle(
+                            fontSize: dataController.titleTextSize.value),
+                      ),
+                      const SizedBox(width: 5),
+                      SizedBox(
+                        width: 200, // Same fixed width as above
+                        child: TextField(
+                          onChanged: (value) {},
+                          controller: vinController,
+                          style: TextStyle(
+                              fontSize: dataController.normalTextSize.value),
+                          decoration: const InputDecoration(hintText: ""),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                      height: 20 * dataController.currentScaleFactor.value),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -1250,39 +1341,54 @@ class InstallerHomeScreenState extends State<InstallerHomeScreen> {
                         style: TextStyle(
                             fontSize: dataController.titleTextSize.value),
                       ),
-                      const SizedBox(
-                        width: 5,
-                      ),
-                      Expanded(
-                          child: TextField(
-                        onChanged: (value) {},
-                        controller: carOwnerEditController,
-                        style: TextStyle(
-                            fontSize: dataController.normalTextSize.value),
-                        decoration:
-                            const InputDecoration(hintText: "Enter car owner"),
-                      )),
-                      const SizedBox(
-                        width: 5,
-                      ),
-                      OutlinedButton(
-                        onPressed: () async {},
-                        style: OutlinedButton.styleFrom(
-                            side: const BorderSide(
-                                color: Color.fromARGB(255, 108, 93, 245)),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                  0), // Set the border radius to 0 for a rectangular shape
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 15)),
-                        child: Text(
-                          'SUBMIT',
-                          style: TextStyle(
-                            fontSize: dataController.normalTextSize.value,
+                      const SizedBox(width: 5),
+                      SizedBox(
+                        width: 200, // Same fixed width as above
+                        child: TextField(
+                          controller: carOwnerEmailController,
+                          onChanged: (value) {
+                            // Trigger rebuild to update error text
+                            dataController.update();
+                          },
+                          decoration: InputDecoration(
+                            hintText: "Enter car owner email address",
+                            errorText:
+                                isValidEmail(carOwnerEmailController.text)
+                                    ? null
+                                    : "Please enter a valid email",
                           ),
                         ),
-                      )
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 15 * dataController.currentScaleFactor.value,
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        // Makes the button take full width
+                        child: ElevatedButton(
+                          onPressed: () async {},
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color.fromARGB(
+                                255, 108, 93, 245), // Blue background
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                  0), // No rounded corners
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 15),
+                          ),
+                          child: Text(
+                            'SUBMIT',
+                            style: TextStyle(
+                              fontSize: dataController.normalTextSize.value,
+                              color: Colors.white, // White text for contrast
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                   SizedBox(

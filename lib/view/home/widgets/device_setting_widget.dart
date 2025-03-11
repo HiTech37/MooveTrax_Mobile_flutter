@@ -349,7 +349,7 @@ class _DeviceSettingWidgetState extends State<DeviceSettingWidget> {
             ),
             Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               Text(
-                'Select Command',
+                "${selectedDeviceData['uniqueId']} => ${selectedDeviceData['deviceType']}",
                 style: TextStyle(
                     fontSize: dataController.titleTextSize.value,
                     fontWeight: FontWeight.w600),
@@ -428,7 +428,14 @@ class _DeviceSettingWidgetState extends State<DeviceSettingWidget> {
                     size: dataController.iconSize.value,
                     color: lockStatus ? Colors.green : Colors.grey[600]),
               ),
-            if (selectedDeviceData['deviceType'].toString() != "usb")
+            if (!(selectedDeviceData['uniqueId']
+                        .toString()
+                        .startsWith('MT3V') ||
+                    selectedDeviceData['uniqueId']
+                        .toString()
+                        .startsWith('MT2V')) &&
+                selectedDeviceData['deviceType'].toString() != "tesla" &&
+                selectedDeviceData['deviceType'].toString() != "usb")
               ListTile(
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
@@ -449,6 +456,111 @@ class _DeviceSettingWidgetState extends State<DeviceSettingWidget> {
                 },
                 title: Text(
                   'Horn',
+                  style: TextStyle(
+                      fontSize: dataController.normalTextSize.value,
+                      fontWeight: FontWeight.w500),
+                ),
+                subtitle: Text(
+                  lastHornCommandDate,
+                  style:
+                      TextStyle(fontSize: dataController.smallTextSize.value),
+                ),
+                trailing: Icon(hornStatus ? Icons.done_all : Icons.check,
+                    size: dataController.iconSize.value,
+                    color: hornStatus ? Colors.green : Colors.grey[600]),
+              ),
+            if (selectedDeviceData['uniqueId'].toString().startsWith('MT3V') ||
+                selectedDeviceData['uniqueId'].toString().startsWith('MT2V'))
+              ListTile(
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                onTap: () async {
+                  await deviceController.sendCommand({
+                    'command': 'LightHorn',
+                    'userId': authController.storageUserData?['id'],
+                    'deviceId': dataController.currentDeviceId.value
+                  });
+                  Get.back();
+
+                  if (deviceController.apiStatus.value == ApiState.success) {
+                    Get.snackbar("Command", "Sent Command.",
+                        backgroundColor: Colors.green,
+                        colorText: Colors.white,
+                        animationDuration: const Duration(milliseconds: 300));
+                  }
+                },
+                title: Text(
+                  'Horn + Light',
+                  style: TextStyle(
+                      fontSize: dataController.normalTextSize.value,
+                      fontWeight: FontWeight.w500),
+                ),
+                subtitle: Text(
+                  lastHornCommandDate,
+                  style:
+                      TextStyle(fontSize: dataController.smallTextSize.value),
+                ),
+                trailing: Icon(hornStatus ? Icons.done_all : Icons.check,
+                    size: dataController.iconSize.value,
+                    color: hornStatus ? Colors.green : Colors.grey[600]),
+              ),
+            if (selectedDeviceData['deviceType'].toString() == "tesla")
+              ListTile(
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                onTap: () async {
+                  await deviceController.sendCommand({
+                    'command': 'HonkHorn',
+                    'userId': authController.storageUserData?['id'],
+                    'deviceId': dataController.currentDeviceId.value
+                  });
+                  Get.back();
+
+                  if (deviceController.apiStatus.value == ApiState.success) {
+                    Get.snackbar("Command", "Sent Command.",
+                        backgroundColor: Colors.green,
+                        colorText: Colors.white,
+                        animationDuration: const Duration(milliseconds: 300));
+                  }
+                },
+                title: Text(
+                  'HonkHorn',
+                  style: TextStyle(
+                      fontSize: dataController.normalTextSize.value,
+                      fontWeight: FontWeight.w500),
+                ),
+                subtitle: Text(
+                  lastHornCommandDate,
+                  style:
+                      TextStyle(fontSize: dataController.smallTextSize.value),
+                ),
+                trailing: Icon(hornStatus ? Icons.done_all : Icons.check,
+                    size: dataController.iconSize.value,
+                    color: hornStatus ? Colors.green : Colors.grey[600]),
+              ),
+            if (selectedDeviceData['uniqueId'].toString().startsWith('MT3V') ||
+                selectedDeviceData['uniqueId'].toString().startsWith('MT2V') ||
+                selectedDeviceData['deviceType'].toString() == "tesla")
+              ListTile(
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                onTap: () async {
+                  await deviceController.sendCommand({
+                    'command': 'Light',
+                    'userId': authController.storageUserData?['id'],
+                    'deviceId': dataController.currentDeviceId.value
+                  });
+                  Get.back();
+
+                  if (deviceController.apiStatus.value == ApiState.success) {
+                    Get.snackbar("Command", "Sent Command.",
+                        backgroundColor: Colors.green,
+                        colorText: Colors.white,
+                        animationDuration: const Duration(milliseconds: 300));
+                  }
+                },
+                title: Text(
+                  'Light',
                   style: TextStyle(
                       fontSize: dataController.normalTextSize.value,
                       fontWeight: FontWeight.w500),
@@ -678,7 +790,10 @@ class _DeviceSettingWidgetState extends State<DeviceSettingWidget> {
                       fontWeight: FontWeight.w500),
                 ),
               ),
-            if (selectedDeviceData['uniqueId'].toString().startsWith('MT3V') &&
+            if ((selectedDeviceData['uniqueId'].toString().startsWith('MT3V') ||
+                    selectedDeviceData['uniqueId']
+                        .toString()
+                        .startsWith('MT2V')) &&
                 selectedDeviceData['deviceType'].toString() != "usb")
               ListTile(
                 onTap: () async {
