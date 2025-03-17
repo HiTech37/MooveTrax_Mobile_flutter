@@ -44,6 +44,7 @@ class _DeviceSettingWidgetState extends State<DeviceSettingWidget> {
   String overSpeedStr = '';
   dynamic selectedDeviceData;
   dynamic emnifyConnectivity;
+  dynamic signalHealthy;
   String streetName = '';
 
   TextEditingController overSpeedEditController =
@@ -75,6 +76,19 @@ class _DeviceSettingWidgetState extends State<DeviceSettingWidget> {
       if (!mounted) return;
       setState(() {
         selectedDeviceData = deviceController.selectedDeviceData.value;
+
+        String timestampStr = selectedDeviceData['lastConnect'];
+        DateTime givenTime = DateTime.parse(timestampStr).toUtc();
+        DateTime now = DateTime.now().toUtc();
+        int differenceInSeconds = now.difference(givenTime).inSeconds;
+
+        if (selectedDeviceData['status'] == 'offline') {
+          signalHealthy = selectedDeviceData['signal_lowest'] / 31 * 100;
+        } else if (differenceInSeconds < 600) {
+          signalHealthy = selectedDeviceData['signal'] / 31 * 100;
+        } else {
+          signalHealthy = selectedDeviceData['signal_lowest'] / 31 * 100;
+        }
       });
     }
     await deviceController.checkEmnifyConnectivity(
@@ -902,6 +916,7 @@ class _DeviceSettingWidgetState extends State<DeviceSettingWidget> {
                     SizedBox(
                       height: 20 * dataController.currentScaleFactor.value,
                     ),
+                    if(selectedDeviceData['deviceType'] == 'moovetrax')
                     Row(
                       children: [
                         Text(
@@ -917,16 +932,7 @@ class _DeviceSettingWidgetState extends State<DeviceSettingWidget> {
                         if (selectedDeviceData['deviceType'] != 'smartcar' &&
                             selectedDeviceData['deviceType'] != 'tesla')
                           TriangleIcon(
-                            percentage: (selectedDeviceData['mt2v_dc_volt'] ==
-                                    null
-                                ? 100
-                                : selectedDeviceData['deviceType'] == 'tesla'
-                                    ? double.parse(
-                                        selectedDeviceData['mt2v_dc_volt'])
-                                    : double.parse(selectedDeviceData[
-                                            'mt2v_dc_volt']) *
-                                        100 /
-                                        15),
+                            percentage: (signalHealthy),
                           ),
                         if (selectedDeviceData['deviceType'] != 'smartcar' &&
                             selectedDeviceData['deviceType'] != 'tesla')
@@ -935,13 +941,7 @@ class _DeviceSettingWidgetState extends State<DeviceSettingWidget> {
                           ),
                         if (selectedDeviceData['deviceType'] != 'smartcar' &&
                             selectedDeviceData['deviceType'] != 'tesla')
-                          Text(
-                            selectedDeviceData['mt2v_dc_volt'] == null
-                                ? '100%'
-                                : selectedDeviceData['deviceType'] == 'tesla'
-                                    ? selectedDeviceData['mt2v_dc_volt']
-                                        .toString()
-                                    : '${(double.parse(selectedDeviceData['mt2v_dc_volt']) * 100 / 15).toInt()}%',
+                          Text('${(double.parse(signalHealthy)).toInt()}%',
                             style: TextStyle(
                                 fontSize: dataController.normalTextSize.value),
                           )

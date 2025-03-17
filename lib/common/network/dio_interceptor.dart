@@ -21,7 +21,7 @@ class DioInterceptor extends Interceptor {
     logger.i('HTTP method => ${options.method} ');
     logger.i(
         'Request => ${options.baseUrl}${options.path}${options.queryParameters.format}');
-    logger.i('Header  => ${options.headers}');
+    
     String token = userData == null
         ? installerKey == null
             ? ''
@@ -32,7 +32,10 @@ class DioInterceptor extends Interceptor {
     options.headers = {
       'Authorization': 'Bearer $token',
       'content-Type': 'application/json',
+      'moovetrax-client-type': 'app',
+      'moovetrax-client-version': '1.1.9'
     };
+    logger.i('Header  => ${options.headers}');
     return super.onRequest(options, handler);
   }
 
