@@ -913,40 +913,43 @@ class _DeviceSettingWidgetState extends State<DeviceSettingWidget> {
                         ),
                       )
                     ]),
-                    SizedBox(
-                      height: 20 * dataController.currentScaleFactor.value,
-                    ),
-                    if(selectedDeviceData['deviceType'] == 'moovetrax')
-                    Row(
-                      children: [
-                        Text(
-                          emnifyConnectivity != null &&
-                                  emnifyConnectivity['operatorName'] != null
-                              ? emnifyConnectivity['operatorName']
-                              : '',
-                          style: TextStyle(
-                            fontSize: dataController.normalTextSize.value,
-                          ),
-                        ),
-                        const Spacer(),
-                        if (selectedDeviceData['deviceType'] != 'smartcar' &&
-                            selectedDeviceData['deviceType'] != 'tesla')
-                          TriangleIcon(
-                            percentage: (signalHealthy),
-                          ),
-                        if (selectedDeviceData['deviceType'] != 'smartcar' &&
-                            selectedDeviceData['deviceType'] != 'tesla')
-                          const SizedBox(
-                            width: 10,
-                          ),
-                        if (selectedDeviceData['deviceType'] != 'smartcar' &&
-                            selectedDeviceData['deviceType'] != 'tesla')
-                          Text('${(double.parse(signalHealthy)).toInt()}%',
+                    if (selectedDeviceData['deviceType'] == 'moovetrax')
+                      SizedBox(
+                        height: 20 * dataController.currentScaleFactor.value,
+                      ),
+                    if (selectedDeviceData['deviceType'] == 'moovetrax')
+                      Row(
+                        children: [
+                          Text(
+                            emnifyConnectivity != null &&
+                                    emnifyConnectivity['operatorName'] != null
+                                ? emnifyConnectivity['operatorName']
+                                : '',
                             style: TextStyle(
-                                fontSize: dataController.normalTextSize.value),
-                          )
-                      ],
-                    ),
+                              fontSize: dataController.normalTextSize.value,
+                            ),
+                          ),
+                          const Spacer(),
+                          if (selectedDeviceData['deviceType'] != 'smartcar' &&
+                              selectedDeviceData['deviceType'] != 'tesla')
+                            TriangleIcon(
+                              percentage: (signalHealthy),
+                            ),
+                          if (selectedDeviceData['deviceType'] != 'smartcar' &&
+                              selectedDeviceData['deviceType'] != 'tesla')
+                            const SizedBox(
+                              width: 10,
+                            ),
+                          if (selectedDeviceData['deviceType'] != 'smartcar' &&
+                              selectedDeviceData['deviceType'] != 'tesla')
+                            Text(
+                              '${(signalHealthy).toInt()}%',
+                              style: TextStyle(
+                                  fontSize:
+                                      dataController.normalTextSize.value),
+                            )
+                        ],
+                      ),
                     SizedBox(
                       height: 20 * dataController.currentScaleFactor.value,
                     ),
