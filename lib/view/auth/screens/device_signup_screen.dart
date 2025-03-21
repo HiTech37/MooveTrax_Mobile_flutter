@@ -415,12 +415,15 @@ class DeviceSignupScreenState extends State<DeviceSignupScreen> {
                                             .deviceSignupResult.value !=
                                         null) {
                                       if (authController.deviceSignupResult
-                                              .value['error'] !=
-                                          null) {
+                                                  .value['error'] !=
+                                              null ||
+                                          authController.deviceSignupResult
+                                                  .value['message'] !=
+                                              null) {
                                         Get.snackbar(
                                             "Login Failed",
                                             authController.deviceSignupResult
-                                                .value['error'],
+                                                .value['message'],
                                             backgroundColor: Colors.red,
                                             colorText: Colors.white,
                                             animationDuration: const Duration(

@@ -126,9 +126,7 @@ String convertUTCtoLocal(String utcDateString) {
   DateTime utcDate = DateTime.parse(utcDateString);
 
   DateTime localDate = utcDate.toLocal();
-
-  String formattedDate =
-      "${DateFormat('EEE').format(localDate)} ${DateFormat('MMM').format(localDate)} ${DateFormat('dd').format(localDate)}";
+  String formattedDate = DateFormat('MMMM dd, yyyy hh:mm a').format(localDate);
 
   return formattedDate;
 }

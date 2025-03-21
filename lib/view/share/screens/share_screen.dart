@@ -1,3 +1,4 @@
+import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
 
@@ -120,6 +121,9 @@ class ShareScreenState extends State<ShareScreen> {
   List<TextEditingController> locationEditControllers = [];
   List<TextEditingController> unlockEditControllers = [];
   List<TextEditingController> unkillEditControllers = [];
+
+  String selectedDeviceId = "";
+
   @override
   void initState() {
     super.initState();
@@ -247,61 +251,26 @@ class ShareScreenState extends State<ShareScreen> {
   void initData() async {
     if (!mounted) return;
 
-    List<String> gmtOffsets = [];
+    var url = Uri.parse('https://moovetrax.com:8088/timezone-list/all');
 
-    tz.initializeTimeZones();
-    List<String> timeZones = tz.timeZoneDatabase.locations.keys.toList();
+    try {
+      var response = await http.get(url);
 
-    for (String timeZoneName in timeZones) {
-      // Load the time zone from the database
-      final location = tz.getLocation(timeZoneName);
-
-      // Get the current time in that time zone
-      final now = tz.TZDateTime.now(location);
-
-      // Get the offset from UTC (in minutes)
-      final offset = now.timeZoneOffset;
-
-      // Convert the offset to hours and minutes (e.g., GMT+X or GMT-X)
-      final sign = offset.isNegative ? '-' : '+';
-      final hours = offset.inHours.abs();
-      final minutes = offset.inMinutes.abs() % 60;
-
-      // Format the GMT string
-      String gmtString = 'GMT$sign$hours:${minutes.toString().padLeft(2, '0')}';
-
-      // Print the result
-      gmtOffsets.add(gmtString);
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body);
+        var timezoneData = data['timezoneList'];
+        setState(() {
+          timezoneList = List<String>.from(
+              timezoneData.map((item) => item['timezone'].toString()));
+        });
+      } else {
+        print('Error: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Failed to fetch data: $e');
     }
-    gmtOffsets = gmtOffsets.toSet().toList();
-    gmtOffsets.sort((a, b) {
-      // Extract the numeric offset from 'GMT+X' or 'GMT-X'
-      int offsetA = int.parse(a.replaceAll(RegExp(r'[^+-\d]'), ''));
-      int offsetB = int.parse(b.replaceAll(RegExp(r'[^+-\d]'), ''));
 
-      // Compare the numeric offsets
-      return offsetA.compareTo(offsetB);
-    });
-
-    setState(() {
-      timezoneList = gmtOffsets;
-    });
-
-    final localLocation = tz.getLocation('US/Eastern');
-
-    // Get the current time in that time zone
-    final now = tz.TZDateTime.now(localLocation);
-
-    // Get the offset from UTC (in minutes)
-    final offset = now.timeZoneOffset;
-
-    // Convert the offset to hours and minutes (e.g., GMT+X or GMT-X)
-    final sign = offset.isNegative ? '-' : '+';
-    final hours = offset.inHours.abs();
-    final minutes = offset.inMinutes.abs() % 60;
-
-    // Format the GMT string
-    selectedTimeZone = 'GMT$sign$hours:${minutes.toString().padLeft(2, '0')}';
+    selectedTimeZone = 'America/New_York';
 
     await deviceController.getMainPageData();
     if (deviceController.apiStatus.value == ApiState.failure) {
@@ -324,7 +293,7 @@ class ShareScreenState extends State<ShareScreen> {
           .where((item) =>
               item['id'].toString() == dataController.currentDeviceId.value)
           .toList();
-
+      selectedDeviceId = dataController.currentDeviceId.value;
       setState(() {
         if (matchedItems.isEmpty) {
           deviceValue = deviceList.first;
@@ -2185,6 +2154,7 @@ class ShareScreenState extends State<ShareScreen> {
         setState(() {
           deviceValue = value;
           updateDeviceData(deviceValue['id'].toString());
+          selectedDeviceId = deviceValue['id'].toString();
         });
       },
       dropdownMenuEntries:
@@ -2304,7 +2274,9 @@ class ShareScreenState extends State<ShareScreen> {
                   borderRadius:
                       BorderRadius.circular(10.0), // Set the border radius
                 ),
-                child: TuroSetupWidget(onChanged: (value) {})));
+                child: TuroSetupWidget(
+                    selectedDeviceId: selectedDeviceId,
+                    onChanged: (value) {})));
           },
           child: Padding(
               padding:

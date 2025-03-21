@@ -48,6 +48,7 @@ class DioExceptions implements Exception {
       case 401:
         return AppString.unauthorized;
       case 403:
+        authController.logOut();
         return AppString.forbidden;
       case 404:
         return AppString.notFound;
@@ -61,6 +62,8 @@ class DioExceptions implements Exception {
         }
         if (error is Map && error['error'] != null) {
           return error['error'];
+        } else if (error['message'] != null) {
+          return error['message'];
         } else if (error is String) {
           return error;
         } else {

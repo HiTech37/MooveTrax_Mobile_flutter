@@ -6,6 +6,7 @@ import 'package:moovetrax/common/widget/youtube_player.dart';
 import 'package:moovetrax/di.dart';
 import 'package:moovetrax/viewmodel/data_controller.dart';
 import 'package:moovetrax/viewmodel/reports/controller/reports_controller.dart';
+import 'package:moovetrax/viewmodel/device/controller/device_controller.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class EmailItem {
@@ -16,8 +17,10 @@ class EmailItem {
 }
 
 class TuroSetupWidget extends StatefulWidget {
+  final String selectedDeviceId;
   const TuroSetupWidget({
     super.key,
+    required this.selectedDeviceId,
     required this.onChanged,
   });
 
@@ -32,6 +35,7 @@ class _TuroSetupWidgetState extends State<TuroSetupWidget> {
   final ReportsController reportsController = getIt<ReportsController>();
   String howToVideoId = "ISVv_ZYMkaQ";
   final DataController dataController = Get.find<DataController>();
+  final DeviceController deviceController = getIt<DeviceController>();
 
   bool submitting = false;
   @override
@@ -41,7 +45,26 @@ class _TuroSetupWidgetState extends State<TuroSetupWidget> {
   }
 
   void initData() async {
-    await reportsController.getBatchGeneratLinksPage();
+    await deviceController
+        .getSelectedShareDevicePageData(dataController.currentDeviceId.value);
+    if (deviceController.apiStatus.value == ApiState.failure) {
+      Get.snackbar("Failed", deviceController.errorMessage.value,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          animationDuration: const Duration(milliseconds: 300));
+      return;
+    } else {
+      if (!mounted) return;
+      var selectedDeviceSharePageData =
+          deviceController.selectedDeviceSharePageData.value;
+      var turoList = selectedDeviceSharePageData['turoCalList'];
+      setState(() {
+        turoList.forEach((item) {
+          turoCallList
+              .add(EmailItem(email: item['turo_email'], url: item['url']));
+        });
+      });
+    }
   }
 
   @override
@@ -155,6 +178,17 @@ class _TuroSetupWidgetState extends State<TuroSetupWidget> {
                                 const Duration(milliseconds: 300));
                         return;
                       }
+
+                      if (widget.selectedDeviceId == "") {
+                        Get.snackbar(
+                            "Invalid Device", "Please select a device.",
+                            backgroundColor: Colors.red,
+                            colorText: Colors.white,
+                            animationDuration:
+                                const Duration(milliseconds: 300));
+                        return;
+                      }
+
                       var turoEmailList = [];
                       for (int i = 0; i < turoCallList.length; i++) {
                         turoEmailList.add({
@@ -165,7 +199,10 @@ class _TuroSetupWidgetState extends State<TuroSetupWidget> {
                       setState(() {
                         submitting = true;
                       });
-                      await reportsController.saveTuroCallLinks(turoEmailList);
+                      await reportsController.saveTuroCallLinks({
+                        "deviceId": widget.selectedDeviceId,
+                        "turo_cal": turoEmailList
+                      });
                       setState(() {
                         submitting = false;
                       });

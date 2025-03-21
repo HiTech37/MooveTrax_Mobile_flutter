@@ -581,7 +581,7 @@ class SharedLinksScreenState extends State<SharedLinksScreen> {
                       sharedLinksData['data'][index]["allot_miles"]
                                   .toString() ==
                               'null'
-                          ? ""
+                          ? "0"
                           : sharedLinksData['data'][index]["allot_miles"]
                               .toString(),
                       style: TextStyle(
@@ -594,7 +594,8 @@ class SharedLinksScreenState extends State<SharedLinksScreen> {
                                   ["end_odometer"]) -
                               double.parse(sharedLinksData['data'][index]
                                   ["start_odometer"]))
-                          .toStringAsFixed(1),
+                          .round()
+                          .toStringAsFixed(0),
                       style: TextStyle(
                           fontSize: dataController.normalTextSize.value),
                     ),

@@ -391,12 +391,28 @@ class DeviceEditScreenState extends State<DeviceEditScreen> {
                           });
                         },
                         controller: vinEditController,
+                        enabled: deviceData['deviceType'] != 'tesla' &&
+                            deviceData['deviceType'] !=
+                                'smartcar', // Disable if deviceType is 'tesla' or 'smartcar'
                         style: TextStyle(
-                            fontSize: dataController.normalTextSize.value),
+                          fontSize: dataController.normalTextSize.value,
+                          color: (deviceData['deviceType'] == 'tesla' ||
+                                  deviceData['deviceType'] == 'smartcar')
+                              ? Colors.grey
+                              : Colors
+                                  .black, // Optional: Change text color when disabled
+                        ),
                         decoration: InputDecoration(
-                            labelText: 'VIN',
-                            labelStyle: TextStyle(
-                                fontSize: dataController.normalTextSize.value)),
+                          labelText: 'VIN',
+                          labelStyle: TextStyle(
+                            fontSize: dataController.normalTextSize.value,
+                            color: (deviceData['deviceType'] == 'tesla' ||
+                                    deviceData['deviceType'] == 'smartcar')
+                                ? Colors.grey
+                                : Colors
+                                    .black, // Optional: Change label color when disabled
+                          ),
+                        ),
                       ),
                       SizedBox(
                         height: 20 * dataController.currentScaleFactor.value,

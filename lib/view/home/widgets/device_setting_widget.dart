@@ -77,17 +77,22 @@ class _DeviceSettingWidgetState extends State<DeviceSettingWidget> {
       setState(() {
         selectedDeviceData = deviceController.selectedDeviceData.value;
 
-        String timestampStr = selectedDeviceData['lastConnect'];
-        DateTime givenTime = DateTime.parse(timestampStr).toUtc();
-        DateTime now = DateTime.now().toUtc();
-        int differenceInSeconds = now.difference(givenTime).inSeconds;
+        if (selectedDeviceData['deviceType'] == 'moovetrax' &&
+            selectedDeviceData['lastConnect'] != null &&
+            selectedDeviceData['signal_lowest'] != null &&
+            selectedDeviceData['signal'] != null) {
+          String timestampStr = selectedDeviceData['lastConnect'];
+          DateTime givenTime = DateTime.parse(timestampStr).toUtc();
+          DateTime now = DateTime.now().toUtc();
+          int differenceInSeconds = now.difference(givenTime).inSeconds;
 
-        if (selectedDeviceData['status'] == 'offline') {
-          signalHealthy = selectedDeviceData['signal_lowest'] / 31 * 100;
-        } else if (differenceInSeconds < 600) {
-          signalHealthy = selectedDeviceData['signal'] / 31 * 100;
-        } else {
-          signalHealthy = selectedDeviceData['signal_lowest'] / 31 * 100;
+          if (selectedDeviceData['status'] == 'offline') {
+            signalHealthy = selectedDeviceData['signal_lowest'] / 31 * 100;
+          } else if (differenceInSeconds < 600) {
+            signalHealthy = selectedDeviceData['signal'] / 31 * 100;
+          } else {
+            signalHealthy = selectedDeviceData['signal_lowest'] / 31 * 100;
+          }
         }
       });
     }
@@ -931,7 +936,8 @@ class _DeviceSettingWidgetState extends State<DeviceSettingWidget> {
                           ),
                           const Spacer(),
                           if (selectedDeviceData['deviceType'] != 'smartcar' &&
-                              selectedDeviceData['deviceType'] != 'tesla')
+                              selectedDeviceData['deviceType'] != 'tesla' &&
+                              signalHealthy != null)
                             TriangleIcon(
                               percentage: (signalHealthy),
                             ),
@@ -941,7 +947,8 @@ class _DeviceSettingWidgetState extends State<DeviceSettingWidget> {
                               width: 10,
                             ),
                           if (selectedDeviceData['deviceType'] != 'smartcar' &&
-                              selectedDeviceData['deviceType'] != 'tesla')
+                              selectedDeviceData['deviceType'] != 'tesla' &&
+                              signalHealthy != null)
                             Text(
                               '${(signalHealthy).toInt()}%',
                               style: TextStyle(
