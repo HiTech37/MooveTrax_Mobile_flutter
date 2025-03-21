@@ -38,6 +38,7 @@ class ShareScreen extends StatefulWidget {
 class ShareScreenState extends State<ShareScreen> {
   List<dynamic> deviceList = [];
   List<dynamic> turoTripList = [];
+  List<dynamic> usedTripIdList = [];
   Map<String, dynamic> deviceValue = {};
   String howToUploadRequirementsVideo = "Wiks5TRTzBA";
   String? selectedTimeZone;
@@ -333,6 +334,7 @@ class ShareScreenState extends State<ShareScreen> {
         selectedDeviceSharePageData =
             deviceController.selectedDeviceSharePageData.value;
         setTuroTripList(selectedDeviceSharePageData['turoTripList']);
+
         if (selectedDeviceSharePageData['device']['share_settings'] == null) {
           shareSetting = {};
         } else {
@@ -437,8 +439,8 @@ class ShareScreenState extends State<ShareScreen> {
 
   void setTuroTripList(List<dynamic> turoTripData) {
     if (turoTripData.isNotEmpty) {
+      usedTripIdList = selectedDeviceSharePageData['usedTripIdList'];
       setState(() {
-        turoTripList = []; // Clear the list before adding new items
         for (var element in turoTripData) {
           final String summary = element['summary'] ?? '';
           final List<String> summaryArr = summary.split('-');
@@ -469,6 +471,7 @@ class ShareScreenState extends State<ShareScreen> {
           int currentTimeStamp = DateTime.now().millisecondsSinceEpoch ~/ 1000;
           int differ =
               getDifferencewithTwotimestamp(currentTimeStamp, startTimestamp!);
+
           if (differ > -24) {
             final String label =
                 "$summaryFirstWord - $summaryLastWord $startTime - $endTime";
@@ -476,13 +479,48 @@ class ShareScreenState extends State<ShareScreen> {
               "id": element['id'],
               "label": label,
               "startTime": startTime,
+              "isCancelled": element['cancelled'] != null ? true : false,
+              "isUsed": usedTripIdList.contains(element['id']) || false,
               "endTime": endTime,
             });
           }
         }
-        turoTripList.sort((a, b) => a["startTime"].compareTo(b["startTime"]));
+
+        int curTimestamp = DateTime.now().toUtc().millisecondsSinceEpoch;
+
+        turoTripList.sort((a, b) {
+          int aTimestamp = _convertToTimestamp(a['startTime']);
+          int bTimestamp = _convertToTimestamp(b['startTime']);
+
+          if (aTimestamp < curTimestamp && bTimestamp >= curTimestamp) {
+            return 1; // Move past trips to the end
+          } else if (bTimestamp < curTimestamp && aTimestamp >= curTimestamp) {
+            return -1; // Move future trips to the front
+          }
+          return aTimestamp.compareTo(bTimestamp); // Sort trips normally
+        });
       });
     }
+  }
+
+  int _convertToTimestamp(dynamic timestamp) {
+    if (timestamp == null) {
+      return 0;
+    }
+
+    if (timestamp is int) {
+      return timestamp;
+    }
+
+    if (timestamp is String) {
+      // Handle numeric string or date-time string
+      return int.tryParse(timestamp) ??
+          DateTime.tryParse(timestamp)?.millisecondsSinceEpoch ??
+          0;
+    }
+
+    // Fallback if the format is unknown
+    return 0;
   }
 
   String convertUnixTimestampToTimezone(
@@ -2178,7 +2216,6 @@ class ShareScreenState extends State<ShareScreen> {
         setState(() {
           DateFormat dateFormat = DateFormat("yyyy-MM-dd HH:mm");
           selectedFromDate = dateFormat.parse(value['startTime']);
-
           selectedFromTime = TimeOfDay(
               hour: selectedFromDate.hour, minute: selectedFromDate.minute);
 
@@ -2190,11 +2227,28 @@ class ShareScreenState extends State<ShareScreen> {
       dropdownMenuEntries:
           turoTripList.map<DropdownMenuEntry<dynamic>>((dynamic value) {
         return DropdownMenuEntry<dynamic>(
-            value: value,
-            label: value['label'],
-            style: ButtonStyle(
-                textStyle: WidgetStateProperty.all(
-                    TextStyle(fontSize: dataController.normalTextSize.value))));
+          value: value,
+          label: value['label'],
+          style: ButtonStyle(
+            foregroundColor: WidgetStateProperty.resolveWith<Color?>(
+              (Set<WidgetState> states) {
+                if (value['isUsed'] == true) {
+                  return Colors.grey;
+                } else {
+                  return Colors.black;
+                }
+              },
+            ),
+            textStyle: WidgetStateProperty.all<TextStyle>(
+              TextStyle(
+                fontSize: dataController.normalTextSize.value,
+                decoration: value['isCancelled'] == true
+                    ? TextDecoration.lineThrough
+                    : TextDecoration.none,
+              ),
+            ),
+          ),
+        );
       }).toList(),
     );
   }
