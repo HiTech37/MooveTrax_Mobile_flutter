@@ -235,4 +235,8 @@ class DeviceRepository {
     return checkItemDataFailOrSuccess(
         deviceApi.updateSharedTextTemplate(params));
   }
+
+  Future<Either<String, dynamic>> updateTimeZone(dynamic params) async {
+    return checkItemDataFailOrSuccess(deviceApi.updateTimeZone(params));
+  }
 }

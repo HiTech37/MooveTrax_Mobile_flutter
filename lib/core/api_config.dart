@@ -115,6 +115,8 @@ class ApiConfig {
   static const String updateSharedTextTemplate =
       '/devices/updateSharedTextTemplate';
   static const String updatePushToken = '/user/update_pushtoken';
+  static const String updateTimezone = '/devices/notificationTimezone';
+
   static const header = {
     'Authorization': 'Bearer $token',
     'content-Type': 'application/json',

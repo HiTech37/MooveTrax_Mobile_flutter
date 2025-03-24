@@ -457,4 +457,14 @@ class DeviceApi {
       throw DioExceptions;
     }
   }
+
+  Future<dynamic> updateTimeZone(dynamic params) async {
+    final Response response =
+        await dioClient.dio.post(ApiConfig.updateTimezone, data: params);
+    if (response.statusCode.success) {
+      return response.data;
+    } else {
+      throw DioExceptions;
+    }
+  }
 }

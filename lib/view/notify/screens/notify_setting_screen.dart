@@ -1,3 +1,4 @@
+import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -90,6 +91,9 @@ class NotifySettingScreenState extends State<NotifySettingScreen> {
   String possibleTowingEmail = '';
   String severeWeatherEmail = '';
   String lateReturnEmail = '';
+
+  List<String> timezoneList = [];
+  String? selectedTimeZone;
 
   TextEditingController unlockEmailEditController =
       TextEditingController(text: '');
@@ -434,252 +438,311 @@ class NotifySettingScreenState extends State<NotifySettingScreen> {
     initData();
   }
 
+  Future<void> updateTimezone(String timezone) async {
+    await deviceController.updateTimeZone({
+      'user_id': authController.storageUserData?['id'],
+      'device_id': dataController.currentDeviceId.value,
+      'timezone': timezone,
+    });
+    if (deviceController.apiStatus.value == ApiState.failure) {
+      Get.snackbar("Updating Failed", deviceController.errorMessage.value,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          animationDuration: const Duration(milliseconds: 300));
+    } else {
+      Get.snackbar(
+          "Timezone Settings", 'Timezone setting has been updated successfully',
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+          animationDuration: const Duration(milliseconds: 300));
+    }
+    setState(() {
+      selectedTimeZone = timezone;
+    });
+  }
+
   void initData() async {
     if (!mounted) return;
     await deviceController
         .getSelectedDeviceData(dataController.currentDeviceId.value);
     if (!mounted) return;
-    setState(() {
-      deviceNotificationSettingsData = jsonDecode(
-          deviceController.selectedDeviceData.value['notificationSettings']);
-      if (deviceNotificationSettingsData['Lock'] != null) {
-        lockChecked = deviceNotificationSettingsData['Lock']['status'];
-        pushLockChecked =
-            deviceNotificationSettingsData['Lock']['notifyPush'] ?? false;
-        lockEmailEditController.text =
-            deviceNotificationSettingsData['Lock']['email'];
-        lockEmail = deviceNotificationSettingsData['Lock']['email'];
-      }
-      if (deviceNotificationSettingsData['Unlocked_by_Bluetooth'] != null) {
-        unlockedByBluetoothChecked =
-            deviceNotificationSettingsData['Unlocked_by_Bluetooth']['status'];
-        pushUnlockedByBluetoothChecked =
-            deviceNotificationSettingsData['Unlocked_by_Bluetooth']
-                    ['notifyPush'] ??
-                false;
-        unlockedByBluetoothEmailContoroller.text =
-            deviceNotificationSettingsData['Unlocked_by_Bluetooth']['email'];
-        unlockedByBluetoothEmail =
-            deviceNotificationSettingsData['Unlocked_by_Bluetooth']['email'];
-      }
-      if (deviceNotificationSettingsData['Unlock'] != null) {
-        unlockChecked = deviceNotificationSettingsData['Unlock']['status'];
 
-        pushUnlockChecked =
-            deviceNotificationSettingsData['Unlock']['notifyPush'] ?? false;
-        unlockEmailEditController.text =
-            deviceNotificationSettingsData['Unlock']['email'];
-        unlockEmail = deviceNotificationSettingsData['Unlock']['email'];
+    var url = Uri.parse('https://moovetrax.com:8088/timezone-list/all');
+
+    try {
+      var response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body);
+        var timezoneData = data['timezoneList'];
+        setState(() {
+          timezoneList = List<String>.from(
+              timezoneData.map((item) => item['timezone'].toString()));
+        });
+      } else {
+        print('Error: ${response.statusCode}');
       }
-      if (deviceNotificationSettingsData['Locked_by_Bluetooth'] != null) {
-        lockedByBluetoothChecked =
-            deviceNotificationSettingsData['Locked_by_Bluetooth']['status'];
-        pushLockedByBluetoothChecked =
-            deviceNotificationSettingsData['Locked_by_Bluetooth']
-                    ['notifyPush'] ??
-                false;
-        lockedByBluetoothEmailContoroller.text =
-            deviceNotificationSettingsData['Locked_by_Bluetooth']['email'];
-        lockedByBluetoothEmail =
-            deviceNotificationSettingsData['Locked_by_Bluetooth']['email'];
-      }
-      if (deviceNotificationSettingsData['Bluetooth_On'] != null) {
-        bluetoothOnChecked =
-            deviceNotificationSettingsData['Bluetooth_On']['status'];
-        pushBluetoothOnChecked = deviceNotificationSettingsData['Bluetooth_On']
-                ['notifyPush'] ??
-            false;
-        bluetoothOnEmailContoroller.text =
-            deviceNotificationSettingsData['Bluetooth_On']['email'];
-        bluetoothOnEmail =
-            deviceNotificationSettingsData['Bluetooth_On']['email'];
-      }
-      if (deviceNotificationSettingsData['No_Trip_Movement'] != null) {
-        noTripMovementChecked =
-            deviceNotificationSettingsData['No_Trip_Movement']['status'];
-        pushNoTripMovementChecked =
-            deviceNotificationSettingsData['No_Trip_Movement']['notifyPush'] ??
-                false;
-        noTripMovementEmailContoroller.text =
-            deviceNotificationSettingsData['No_Trip_Movement']['email'];
-        noTripMovementEmail =
-            deviceNotificationSettingsData['No_Trip_Movement']['email'];
-      }
-      if (deviceNotificationSettingsData['Possible_Towing'] != null) {
-        possibleTowingChecked =
-            deviceNotificationSettingsData['Possible_Towing']['status'];
-        pushPossibleTowingChecked =
-            deviceNotificationSettingsData['Possible_Towing']['notifyPush'] ??
-                false;
-        possibleTowingEmailContoroller.text =
-            deviceNotificationSettingsData['Possible_Towing']['email'];
-        possibleTowingEmail =
-            deviceNotificationSettingsData['Possible_Towing']['email'];
-      }
-      if (deviceNotificationSettingsData['Severe_Weather'] != null) {
-        severeWeatherChecked =
-            deviceNotificationSettingsData['Severe_Weather']['status'];
-        pushSevereWeatherChecked =
-            deviceNotificationSettingsData['Severe_Weather']['notifyPush'] ??
-                false;
-        severeWeatherEmailContoroller.text =
-            deviceNotificationSettingsData['Severe_Weather']['email'];
-        severeWeatherEmail =
-            deviceNotificationSettingsData['Severe_Weather']['email'];
-      }
-      if (deviceNotificationSettingsData['Late_Return'] != null) {
-        lateReturnChecked =
-            deviceNotificationSettingsData['Late_Return']['status'];
-        pushLateReturnChecked = deviceNotificationSettingsData['Late_Return']
-                ['notifyPush'] ??
-            false;
-        lateReturnEmailContoroller.text =
-            deviceNotificationSettingsData['Late_Return']['email'];
-        lateReturnEmail =
-            deviceNotificationSettingsData['Late_Return']['email'];
-      }
-      if (deviceNotificationSettingsData['Bluetooth_Off'] != null) {
-        bluetoothOffChecked =
-            deviceNotificationSettingsData['Bluetooth_Off']['status'];
-        pushBluetoothOffChecked =
-            deviceNotificationSettingsData['Bluetooth_Off']['notifyPush'] ??
-                false;
-        bluetoothOffEmailContoroller.text =
-            deviceNotificationSettingsData['Bluetooth_Off']['email'];
-        bluetoothOffEmail =
-            deviceNotificationSettingsData['Bluetooth_Off']['email'];
-      }
-      if (deviceNotificationSettingsData['Low_Battery'] != null) {
-        lowBatteryChecked =
-            deviceNotificationSettingsData['Low_Battery']['status'];
-        pushLowBatteryChecked = deviceNotificationSettingsData['Low_Battery']
-                ['notifyPush'] ??
-            false;
-        lowBatteryEmailContoroller.text =
-            deviceNotificationSettingsData['Low_Battery']['email'];
-        lowBatteryEmail =
-            deviceNotificationSettingsData['Low_Battery']['email'];
-        lowBatteryLevel =
-            deviceNotificationSettingsData['Low_Battery']['value'] ?? '11';
-        lowBatteryLevelEditController.text = lowBatteryLevel;
-      }
-      if (deviceNotificationSettingsData['Hood'] != null) {
-        hoodChecked = deviceNotificationSettingsData['Hood']['status'];
-        pushHoodChecked =
-            deviceNotificationSettingsData['Hood']['notifyPush'] ?? false;
-        hoodEmailContoroller.text =
-            deviceNotificationSettingsData['Hood']['email'];
-        hoodEmail = deviceNotificationSettingsData['Hood']['email'];
-      }
-      if (deviceNotificationSettingsData['Door'] != null) {
-        doorChecked = deviceNotificationSettingsData['Door']['status'];
-        pushDoorChecked =
-            deviceNotificationSettingsData['Door']['notifyPush'] ?? false;
-        doorEmailContoroller.text =
-            deviceNotificationSettingsData['Door']['email'];
-        doorEmail = deviceNotificationSettingsData['Door']['email'];
-      }
-      if (deviceNotificationSettingsData['Shock'] != null) {
-        shockChecked = deviceNotificationSettingsData['Shock']['status'];
-        pushShockChecked =
-            deviceNotificationSettingsData['Shock']['notifyPush'] ?? false;
-        shockEmailContoroller.text =
-            deviceNotificationSettingsData['Shock']['email'];
-        shockEmail = deviceNotificationSettingsData['Shock']['email'];
-      }
-      if (deviceNotificationSettingsData['Device_Suspension'] != null) {
-        deviceSuspensionChecked =
-            deviceNotificationSettingsData['Device_Suspension']['status'];
-        pushDeviceSuspensionChecked =
-            deviceNotificationSettingsData['Device_Suspension']['notifyPush'] ??
-                false;
-        deviceSuspensionEmailContoroller.text =
-            deviceNotificationSettingsData['Device_Suspension']['email'];
-        deviceSuspensionEmail =
-            deviceNotificationSettingsData['Device_Suspension']['email'];
-      }
-      if (deviceNotificationSettingsData['Ignition_ACC'] != null) {
-        ignitionOnChecked =
-            deviceNotificationSettingsData['Ignition_ACC']['status'];
-        pushIgnitionOnChecked = deviceNotificationSettingsData['Ignition_ACC']
-                ['notifyPush'] ??
-            false;
-        ignitionOnEmailContoroller.text =
-            deviceNotificationSettingsData['Ignition_ACC']['email'];
-        ignitionOnEmail =
-            deviceNotificationSettingsData['Ignition_ACC']['email'];
-      }
-      if (deviceNotificationSettingsData['No_Position_Update'] != null) {
-        noPositionUpdateChecked =
-            deviceNotificationSettingsData['No_Position_Update']['status'];
-        pushNoPositionUpdateChecked =
-            deviceNotificationSettingsData['No_Position_Update']
-                    ['notifyPush'] ??
-                false;
-        noPositionUpdateEmailContoroller.text =
-            deviceNotificationSettingsData['No_Position_Update']['email'];
-        noPositionUpdateEmail =
-            deviceNotificationSettingsData['No_Position_Update']['email'];
-      }
-      if (deviceNotificationSettingsData['Horn'] != null) {
-        hornChecked = deviceNotificationSettingsData['Horn']['status'];
-        pushHornChecked =
-            deviceNotificationSettingsData['Horn']['notifyPush'] ?? false;
-        hornEmailEditController.text =
-            deviceNotificationSettingsData['Horn']['email'];
-        hornEmail = deviceNotificationSettingsData['Horn']['email'];
-      }
-      if (deviceNotificationSettingsData['Unkill'] != null) {
-        unkillChecked = deviceNotificationSettingsData['Unkill']['status'];
-        pushUnkillChecked =
-            deviceNotificationSettingsData['Unkill']['notifyPush'] ?? false;
-        unkillEmailEditController.text =
-            deviceNotificationSettingsData['Unkill']['email'];
-        unkillEmail = deviceNotificationSettingsData['Unkill']['email'];
-      }
-      if (deviceNotificationSettingsData['Kill'] != null) {
-        killChecked = deviceNotificationSettingsData['Kill']['status'];
-        pushKillChecked =
-            deviceNotificationSettingsData['Kill']['notifyPush'] ?? false;
-        killEmailEditController.text =
-            deviceNotificationSettingsData['Kill']['email'];
-        killEmail = deviceNotificationSettingsData['Kill']['email'];
-      }
-      if (deviceNotificationSettingsData['Overspeed'] != null) {
-        overSpeedChecked =
-            deviceNotificationSettingsData['Overspeed']['status'];
-        pushOverSpeedChecked =
-            deviceNotificationSettingsData['Overspeed']['pushNotify'] ?? false;
-        overspeedEmailEditController.text =
-            deviceNotificationSettingsData['Overspeed']['email'];
-        overSpeedEmail = deviceNotificationSettingsData['Overspeed']['email'];
-      }
-      if (deviceNotificationSettingsData['Offline'] != null) {
-        offlineChecked = deviceNotificationSettingsData['Offline']['status'];
-        pushOfflineChecked =
-            deviceNotificationSettingsData['Offline']['notifyPush'] ?? false;
-        offlineEmailEditController.text =
-            deviceNotificationSettingsData['Offline']['email'];
-        offlineEmail = deviceNotificationSettingsData['Offline']['email'];
-      }
-      if (deviceNotificationSettingsData['Smoking'] != null) {
-        smokingChecked = deviceNotificationSettingsData['Smoking']['status'];
-        pushSmokingChecked =
-            deviceNotificationSettingsData['Smoking']['notifyPush'] ?? false;
-        smokingEmailEditController.text =
-            deviceNotificationSettingsData['Smoking']['email'];
-        smokingEmail = deviceNotificationSettingsData['Smoking']['email'];
-      }
-      if (deviceNotificationSettingsData['Overmiles'] != null) {
-        overMilesChecked =
-            deviceNotificationSettingsData['Overmiles']['status'];
-        pushOverMilesChecked =
-            deviceNotificationSettingsData['Overmiles']['notifyPush'] ?? false;
-        overmilesEmailEditController.text =
-            deviceNotificationSettingsData['Overmiles']['email'];
-        overMilesEmail = deviceNotificationSettingsData['Overmiles']['email'];
-      }
-    });
+    } catch (e) {
+      print('Failed to fetch data: $e');
+    }
+
+    if (deviceController.apiStatus.value == ApiState.failure) {
+      Get.snackbar("Failed", deviceController.errorMessage.value,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          animationDuration: const Duration(milliseconds: 300));
+      return;
+    } else {
+      setState(() {
+        var deviceTimezone =
+            deviceController.selectedDeviceData.value['timezone'];
+        selectedTimeZone = deviceTimezone ?? "GMT";
+
+        deviceNotificationSettingsData = jsonDecode(
+            deviceController.selectedDeviceData.value['notificationSettings']);
+        if (deviceNotificationSettingsData['Lock'] != null) {
+          lockChecked = deviceNotificationSettingsData['Lock']['status'];
+          pushLockChecked =
+              deviceNotificationSettingsData['Lock']['notifyPush'] ?? false;
+          lockEmailEditController.text =
+              deviceNotificationSettingsData['Lock']['email'];
+          lockEmail = deviceNotificationSettingsData['Lock']['email'];
+        }
+        if (deviceNotificationSettingsData['Unlocked_by_Bluetooth'] != null) {
+          unlockedByBluetoothChecked =
+              deviceNotificationSettingsData['Unlocked_by_Bluetooth']['status'];
+          pushUnlockedByBluetoothChecked =
+              deviceNotificationSettingsData['Unlocked_by_Bluetooth']
+                      ['notifyPush'] ??
+                  false;
+          unlockedByBluetoothEmailContoroller.text =
+              deviceNotificationSettingsData['Unlocked_by_Bluetooth']['email'];
+          unlockedByBluetoothEmail =
+              deviceNotificationSettingsData['Unlocked_by_Bluetooth']['email'];
+        }
+        if (deviceNotificationSettingsData['Unlock'] != null) {
+          unlockChecked = deviceNotificationSettingsData['Unlock']['status'];
+
+          pushUnlockChecked =
+              deviceNotificationSettingsData['Unlock']['notifyPush'] ?? false;
+          unlockEmailEditController.text =
+              deviceNotificationSettingsData['Unlock']['email'];
+          unlockEmail = deviceNotificationSettingsData['Unlock']['email'];
+        }
+        if (deviceNotificationSettingsData['Locked_by_Bluetooth'] != null) {
+          lockedByBluetoothChecked =
+              deviceNotificationSettingsData['Locked_by_Bluetooth']['status'];
+          pushLockedByBluetoothChecked =
+              deviceNotificationSettingsData['Locked_by_Bluetooth']
+                      ['notifyPush'] ??
+                  false;
+          lockedByBluetoothEmailContoroller.text =
+              deviceNotificationSettingsData['Locked_by_Bluetooth']['email'];
+          lockedByBluetoothEmail =
+              deviceNotificationSettingsData['Locked_by_Bluetooth']['email'];
+        }
+        if (deviceNotificationSettingsData['Bluetooth_On'] != null) {
+          bluetoothOnChecked =
+              deviceNotificationSettingsData['Bluetooth_On']['status'];
+          pushBluetoothOnChecked =
+              deviceNotificationSettingsData['Bluetooth_On']['notifyPush'] ??
+                  false;
+          bluetoothOnEmailContoroller.text =
+              deviceNotificationSettingsData['Bluetooth_On']['email'];
+          bluetoothOnEmail =
+              deviceNotificationSettingsData['Bluetooth_On']['email'];
+        }
+        if (deviceNotificationSettingsData['No_Trip_Movement'] != null) {
+          noTripMovementChecked =
+              deviceNotificationSettingsData['No_Trip_Movement']['status'];
+          pushNoTripMovementChecked =
+              deviceNotificationSettingsData['No_Trip_Movement']
+                      ['notifyPush'] ??
+                  false;
+          noTripMovementEmailContoroller.text =
+              deviceNotificationSettingsData['No_Trip_Movement']['email'];
+          noTripMovementEmail =
+              deviceNotificationSettingsData['No_Trip_Movement']['email'];
+        }
+        if (deviceNotificationSettingsData['Possible_Towing'] != null) {
+          possibleTowingChecked =
+              deviceNotificationSettingsData['Possible_Towing']['status'];
+          pushPossibleTowingChecked =
+              deviceNotificationSettingsData['Possible_Towing']['notifyPush'] ??
+                  false;
+          possibleTowingEmailContoroller.text =
+              deviceNotificationSettingsData['Possible_Towing']['email'];
+          possibleTowingEmail =
+              deviceNotificationSettingsData['Possible_Towing']['email'];
+        }
+        if (deviceNotificationSettingsData['Severe_Weather'] != null) {
+          severeWeatherChecked =
+              deviceNotificationSettingsData['Severe_Weather']['status'];
+          pushSevereWeatherChecked =
+              deviceNotificationSettingsData['Severe_Weather']['notifyPush'] ??
+                  false;
+          severeWeatherEmailContoroller.text =
+              deviceNotificationSettingsData['Severe_Weather']['email'];
+          severeWeatherEmail =
+              deviceNotificationSettingsData['Severe_Weather']['email'];
+        }
+        if (deviceNotificationSettingsData['Late_Return'] != null) {
+          lateReturnChecked =
+              deviceNotificationSettingsData['Late_Return']['status'];
+          pushLateReturnChecked = deviceNotificationSettingsData['Late_Return']
+                  ['notifyPush'] ??
+              false;
+          lateReturnEmailContoroller.text =
+              deviceNotificationSettingsData['Late_Return']['email'];
+          lateReturnEmail =
+              deviceNotificationSettingsData['Late_Return']['email'];
+        }
+        if (deviceNotificationSettingsData['Bluetooth_Off'] != null) {
+          bluetoothOffChecked =
+              deviceNotificationSettingsData['Bluetooth_Off']['status'];
+          pushBluetoothOffChecked =
+              deviceNotificationSettingsData['Bluetooth_Off']['notifyPush'] ??
+                  false;
+          bluetoothOffEmailContoroller.text =
+              deviceNotificationSettingsData['Bluetooth_Off']['email'];
+          bluetoothOffEmail =
+              deviceNotificationSettingsData['Bluetooth_Off']['email'];
+        }
+        if (deviceNotificationSettingsData['Low_Battery'] != null) {
+          lowBatteryChecked =
+              deviceNotificationSettingsData['Low_Battery']['status'];
+          pushLowBatteryChecked = deviceNotificationSettingsData['Low_Battery']
+                  ['notifyPush'] ??
+              false;
+          lowBatteryEmailContoroller.text =
+              deviceNotificationSettingsData['Low_Battery']['email'];
+          lowBatteryEmail =
+              deviceNotificationSettingsData['Low_Battery']['email'];
+          lowBatteryLevel =
+              deviceNotificationSettingsData['Low_Battery']['value'] ?? '11';
+          lowBatteryLevelEditController.text = lowBatteryLevel;
+        }
+        if (deviceNotificationSettingsData['Hood'] != null) {
+          hoodChecked = deviceNotificationSettingsData['Hood']['status'];
+          pushHoodChecked =
+              deviceNotificationSettingsData['Hood']['notifyPush'] ?? false;
+          hoodEmailContoroller.text =
+              deviceNotificationSettingsData['Hood']['email'];
+          hoodEmail = deviceNotificationSettingsData['Hood']['email'];
+        }
+        if (deviceNotificationSettingsData['Door'] != null) {
+          doorChecked = deviceNotificationSettingsData['Door']['status'];
+          pushDoorChecked =
+              deviceNotificationSettingsData['Door']['notifyPush'] ?? false;
+          doorEmailContoroller.text =
+              deviceNotificationSettingsData['Door']['email'];
+          doorEmail = deviceNotificationSettingsData['Door']['email'];
+        }
+        if (deviceNotificationSettingsData['Shock'] != null) {
+          shockChecked = deviceNotificationSettingsData['Shock']['status'];
+          pushShockChecked =
+              deviceNotificationSettingsData['Shock']['notifyPush'] ?? false;
+          shockEmailContoroller.text =
+              deviceNotificationSettingsData['Shock']['email'];
+          shockEmail = deviceNotificationSettingsData['Shock']['email'];
+        }
+        if (deviceNotificationSettingsData['Device_Suspension'] != null) {
+          deviceSuspensionChecked =
+              deviceNotificationSettingsData['Device_Suspension']['status'];
+          pushDeviceSuspensionChecked =
+              deviceNotificationSettingsData['Device_Suspension']
+                      ['notifyPush'] ??
+                  false;
+          deviceSuspensionEmailContoroller.text =
+              deviceNotificationSettingsData['Device_Suspension']['email'];
+          deviceSuspensionEmail =
+              deviceNotificationSettingsData['Device_Suspension']['email'];
+        }
+        if (deviceNotificationSettingsData['Ignition_ACC'] != null) {
+          ignitionOnChecked =
+              deviceNotificationSettingsData['Ignition_ACC']['status'];
+          pushIgnitionOnChecked = deviceNotificationSettingsData['Ignition_ACC']
+                  ['notifyPush'] ??
+              false;
+          ignitionOnEmailContoroller.text =
+              deviceNotificationSettingsData['Ignition_ACC']['email'];
+          ignitionOnEmail =
+              deviceNotificationSettingsData['Ignition_ACC']['email'];
+        }
+        if (deviceNotificationSettingsData['No_Position_Update'] != null) {
+          noPositionUpdateChecked =
+              deviceNotificationSettingsData['No_Position_Update']['status'];
+          pushNoPositionUpdateChecked =
+              deviceNotificationSettingsData['No_Position_Update']
+                      ['notifyPush'] ??
+                  false;
+          noPositionUpdateEmailContoroller.text =
+              deviceNotificationSettingsData['No_Position_Update']['email'];
+          noPositionUpdateEmail =
+              deviceNotificationSettingsData['No_Position_Update']['email'];
+        }
+        if (deviceNotificationSettingsData['Horn'] != null) {
+          hornChecked = deviceNotificationSettingsData['Horn']['status'];
+          pushHornChecked =
+              deviceNotificationSettingsData['Horn']['notifyPush'] ?? false;
+          hornEmailEditController.text =
+              deviceNotificationSettingsData['Horn']['email'];
+          hornEmail = deviceNotificationSettingsData['Horn']['email'];
+        }
+        if (deviceNotificationSettingsData['Unkill'] != null) {
+          unkillChecked = deviceNotificationSettingsData['Unkill']['status'];
+          pushUnkillChecked =
+              deviceNotificationSettingsData['Unkill']['notifyPush'] ?? false;
+          unkillEmailEditController.text =
+              deviceNotificationSettingsData['Unkill']['email'];
+          unkillEmail = deviceNotificationSettingsData['Unkill']['email'];
+        }
+        if (deviceNotificationSettingsData['Kill'] != null) {
+          killChecked = deviceNotificationSettingsData['Kill']['status'];
+          pushKillChecked =
+              deviceNotificationSettingsData['Kill']['notifyPush'] ?? false;
+          killEmailEditController.text =
+              deviceNotificationSettingsData['Kill']['email'];
+          killEmail = deviceNotificationSettingsData['Kill']['email'];
+        }
+        if (deviceNotificationSettingsData['Overspeed'] != null) {
+          overSpeedChecked =
+              deviceNotificationSettingsData['Overspeed']['status'];
+          pushOverSpeedChecked = deviceNotificationSettingsData['Overspeed']
+                  ['pushNotify'] ??
+              false;
+          overspeedEmailEditController.text =
+              deviceNotificationSettingsData['Overspeed']['email'];
+          overSpeedEmail = deviceNotificationSettingsData['Overspeed']['email'];
+        }
+        if (deviceNotificationSettingsData['Offline'] != null) {
+          offlineChecked = deviceNotificationSettingsData['Offline']['status'];
+          pushOfflineChecked =
+              deviceNotificationSettingsData['Offline']['notifyPush'] ?? false;
+          offlineEmailEditController.text =
+              deviceNotificationSettingsData['Offline']['email'];
+          offlineEmail = deviceNotificationSettingsData['Offline']['email'];
+        }
+        if (deviceNotificationSettingsData['Smoking'] != null) {
+          smokingChecked = deviceNotificationSettingsData['Smoking']['status'];
+          pushSmokingChecked =
+              deviceNotificationSettingsData['Smoking']['notifyPush'] ?? false;
+          smokingEmailEditController.text =
+              deviceNotificationSettingsData['Smoking']['email'];
+          smokingEmail = deviceNotificationSettingsData['Smoking']['email'];
+        }
+        if (deviceNotificationSettingsData['Overmiles'] != null) {
+          overMilesChecked =
+              deviceNotificationSettingsData['Overmiles']['status'];
+          pushOverMilesChecked = deviceNotificationSettingsData['Overmiles']
+                  ['notifyPush'] ??
+              false;
+          overmilesEmailEditController.text =
+              deviceNotificationSettingsData['Overmiles']['email'];
+          overMilesEmail = deviceNotificationSettingsData['Overmiles']['email'];
+        }
+      });
+    }
   }
 
   Widget overMilesField() {
@@ -2114,6 +2177,29 @@ class NotifySettingScreenState extends State<NotifySettingScreen> {
         ));
   }
 
+  Widget timeZoneField() {
+    return DropdownButton<String>(
+      isExpanded: true,
+      value: selectedTimeZone,
+      hint: Text(
+        'Select a time zone',
+        style: TextStyle(fontSize: dataController.normalTextSize.value),
+      ),
+      items: timezoneList.map((String timeZone) {
+        return DropdownMenuItem<String>(
+          value: timeZone,
+          child: Text(
+            timeZone,
+            style: TextStyle(fontSize: dataController.normalTextSize.value),
+          ),
+        );
+      }).toList(),
+      onChanged: (String? value) async {
+        await updateTimezone(value!);
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -2138,6 +2224,25 @@ class NotifySettingScreenState extends State<NotifySettingScreen> {
           child: Column(
             children: [
               headerField(),
+              SizedBox(
+                height: 20 * dataController.currentScaleFactor.value,
+              ),
+              Row(
+                mainAxisAlignment:
+                    MainAxisAlignment.end, // Push content to edges
+                children: [
+                  Text(
+                    'Timezone',
+                    style: TextStyle(
+                        fontSize: dataController.normalTextSize.value),
+                  ),
+                  const SizedBox(width: 30), // Optional spacing
+                  SizedBox(
+                    width: 210, // Set a fixed width for Dropdown
+                    child: timeZoneField(),
+                  ),
+                ],
+              ),
               SizedBox(
                 height: 20 * dataController.currentScaleFactor.value,
               ),

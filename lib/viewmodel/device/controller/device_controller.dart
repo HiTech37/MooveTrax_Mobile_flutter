@@ -715,4 +715,19 @@ class DeviceController extends GetxController
       },
     );
   }
+
+  Future<void> updateTimeZone(dynamic params) async {
+    apiStatus.value = ApiState.loading;
+    Either<String, dynamic> failureOrSuccess =
+        await deviceRepository.updateTimeZone(params);
+    failureOrSuccess.fold(
+      (String failure) {
+        apiStatus.value = ApiState.failure;
+        errorMessage.value = failure;
+      },
+      (dynamic data) {
+        apiStatus.value = ApiState.success;
+      },
+    );
+  }
 }
