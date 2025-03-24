@@ -50,6 +50,10 @@ class AuthRepository {
         authApi.checkGpsidIccidMatchedForInstaller(data));
   }
 
+  Future<Either<String, dynamic>> signUserDevice(dynamic data) async {
+    return checkItemDataFailOrSuccess(authApi.signUserDevice(data));
+  }
+
   Future<Either<String, dynamic>> checkInstallerDevice(
       dynamic deviceInfo) async {
     return checkItemDataFailOrSuccess(authApi.checkInstallerDevice(deviceInfo));

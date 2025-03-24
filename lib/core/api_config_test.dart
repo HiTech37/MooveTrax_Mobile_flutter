@@ -35,6 +35,7 @@ class ApiConfig {
       '/devices/check-gpsid-iccid-matched';
   static const String checkGpsidIccidMatchedForInstaller =
       '/check-gpsid-iccid-matched';
+  static const String signUserDevice = '/users/sign-user-device';
   static const String checkInstallerDevice = '/check-installer-device';
   static const String event = '/warning/get-data-table';
   static const String command = '/command/get-data-table';

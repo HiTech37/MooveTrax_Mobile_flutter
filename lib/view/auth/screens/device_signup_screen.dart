@@ -64,17 +64,27 @@ class DeviceSignupScreenState extends State<DeviceSignupScreen> {
             .sendInstallerAuthEmail({"token": authController.installerKey});
         Get.toNamed('/installer-home');
       }
-      await authController.checkGpsidIccidMatched({
+      await authController.checkGpsidIccidMatchedForInstaller({
         "iccid_prefix": selectedIccID,
         "iccid": iccID,
         "is_final": 0,
+        "is_type": "true",
         "uniqueId": gpsID,
         "phone_email": email,
         "session": sessionCreated,
         "mobile_installer": "0"
       });
 
-      // Check the result from the API
+      if (authController.apiStatus.value == ApiState.success) {
+        timer.cancel();
+        await authController.signUserDevice(
+            {"deviceType": "moovetrax", "email": email, "uniqueId": gpsID});
+        if (authController.apiStatus.value == ApiState.success) {
+          Get.offAllNamed('/login');
+        }
+      } else {
+        print("=>${authController.errorMessage.value}");
+      }
     });
   }
 
@@ -377,7 +387,8 @@ class DeviceSignupScreenState extends State<DeviceSignupScreen> {
                                   ? "LOGGING IN..."
                                   : "LOGIN",
                               press: () async {
-                                if (_formKey.currentState!.validate()) {
+                                if (_formKey.currentState!.validate() &&
+                                    deviceLogginIn == false) {
                                   if (deviceType == null) {
                                     Get.snackbar("Login failed.",
                                         "Please select a device type!",
@@ -415,21 +426,31 @@ class DeviceSignupScreenState extends State<DeviceSignupScreen> {
                                             .deviceSignupResult.value !=
                                         null) {
                                       if (authController.deviceSignupResult
-                                                  .value['error'] !=
-                                              null ||
-                                          authController.deviceSignupResult
-                                                  .value['message'] !=
-                                              null) {
+                                              .value['error'] !=
+                                          null) {
                                         Get.snackbar(
                                             "Login Failed",
                                             authController.deviceSignupResult
-                                                .value['message'],
+                                                .value['error'],
                                             backgroundColor: Colors.red,
                                             colorText: Colors.white,
                                             animationDuration: const Duration(
                                                 milliseconds: 300));
                                       } else {
-                                        Get.offAllNamed('/login');
+                                        setState(() {
+                                          deviceLogginIn = true;
+                                        });
+                                        Get.snackbar("Waiting",
+                                            "Please wait, Process can take up to 20minutes",
+                                            backgroundColor:
+                                                const Color.fromARGB(
+                                                    255, 180, 87, 0),
+                                            colorText: Colors.white,
+                                            duration:
+                                                const Duration(seconds: 30),
+                                            animationDuration: const Duration(
+                                                microseconds: 300));
+                                        await checkGpsidIccidMatched();
                                       }
                                     }
                                   }

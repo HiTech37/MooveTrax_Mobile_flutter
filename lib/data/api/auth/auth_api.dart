@@ -65,6 +65,16 @@ class AuthApi {
     }
   }
 
+  Future<dynamic> signUserDevice(dynamic gpsIdIccidInfo) async {
+    final Response response = await dioClient.dio
+        .post(ApiConfig.signUserDevice, data: gpsIdIccidInfo);
+    if (response.statusCode.success) {
+      return response.data;
+    } else {
+      throw DioExceptions;
+    }
+  }
+
   Future<dynamic> setDevicesBillingSource() async {
     final Response response =
         await dioClient.dio.post(ApiConfig.setDevicesBillingSource);

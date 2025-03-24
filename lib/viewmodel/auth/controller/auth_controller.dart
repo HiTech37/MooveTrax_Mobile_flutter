@@ -274,6 +274,21 @@ class AuthController extends GetxController
     );
   }
 
+  Future<void> signUserDevice(dynamic data) async {
+    apiStatus.value = ApiState.loading;
+    Either<String, dynamic> failureOrSuccess =
+        await authRepository.signUserDevice(data);
+    failureOrSuccess.fold(
+      (String failure) {
+        apiStatus.value = ApiState.failure;
+        errorMessage.value = failure;
+      },
+      (dynamic data) {
+        apiStatus.value = ApiState.success;
+      },
+    );
+  }
+
   Future<void> getIccidPrefixList() async {
     apiStatus.value = ApiState.loading;
     Either<String, dynamic> failureOrSuccess =

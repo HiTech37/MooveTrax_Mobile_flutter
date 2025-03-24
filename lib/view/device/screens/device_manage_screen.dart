@@ -173,9 +173,11 @@ class DeviceManageScreenState extends State<DeviceManageScreen> {
               animationDuration: const Duration(milliseconds: 30000));
 
           await authController.checkGpsidIccidMatched(deviceData);
-          if (authController.checkGpsidIccidMatchedResult.value['error'] ==
-              null) {
+          if (authController.apiStatus.value == ApiState.success) {
+            timer.cancel();
             Get.toNamed('/home');
+          } else {
+            print("=>${authController.errorMessage.value}");
           }
         });
       } else {

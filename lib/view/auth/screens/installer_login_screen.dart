@@ -65,14 +65,22 @@ class InstallerLoginScreenState extends State<InstallerLoginScreen> {
         "iccid_prefix": selectedIccID,
         "iccid": iccID,
         "is_final": 0,
+        "is_type": "true",
         "uniqueId": gpsID,
         "phone_email": email,
         "session": sessionCreated,
         "mobile_installer": "0"
       });
 
-      // Check the result from the API
+      if (authController.apiStatus.value == ApiState.success) {
+        Get.offAllNamed('/login');
+      }
     });
+    Get.snackbar("Login Failed",
+        "Please ensure device is on, sim is inserted and gps id is correct",
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        animationDuration: const Duration(milliseconds: 300));
   }
 
   Future<void> initIccidPrefixList() async {
