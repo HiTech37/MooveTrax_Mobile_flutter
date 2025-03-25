@@ -165,27 +165,30 @@ class _TuroSetupWidgetState extends State<TuroSetupWidget> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Flexible(
+                Expanded(
+                  // Ensures buttons share space evenly
                   child: DefaultButton(
                     text: submitting ? "SUBMITTING..." : "SUBMIT",
                     press: () async {
                       if (turoCallList.isEmpty) {
                         Get.snackbar(
-                            "No Selected Data", "Please add at least one data",
-                            backgroundColor: Colors.red,
-                            colorText: Colors.white,
-                            animationDuration:
-                                const Duration(milliseconds: 300));
+                          "No Selected Data",
+                          "Please add at least one data",
+                          backgroundColor: Colors.red,
+                          colorText: Colors.white,
+                          animationDuration: const Duration(milliseconds: 300),
+                        );
                         return;
                       }
 
                       if (widget.selectedDeviceId == "") {
                         Get.snackbar(
-                            "Invalid Device", "Please select a device.",
-                            backgroundColor: Colors.red,
-                            colorText: Colors.white,
-                            animationDuration:
-                                const Duration(milliseconds: 300));
+                          "Invalid Device",
+                          "Please select a device.",
+                          backgroundColor: Colors.red,
+                          colorText: Colors.white,
+                          animationDuration: const Duration(milliseconds: 300),
+                        );
                         return;
                       }
 
@@ -209,41 +212,47 @@ class _TuroSetupWidgetState extends State<TuroSetupWidget> {
                       if (reportsController.apiStatus.value ==
                           ApiState.failure) {
                         Get.snackbar(
-                            "Failed! ", reportsController.errorMessage.value,
-                            backgroundColor: Colors.red,
-                            colorText: Colors.white,
-                            animationDuration:
-                                const Duration(milliseconds: 300));
+                          "Failed! ",
+                          reportsController.errorMessage.value,
+                          backgroundColor: Colors.red,
+                          colorText: Colors.white,
+                          animationDuration: const Duration(milliseconds: 300),
+                        );
+                      } else {
+                        Get.back();
                       }
                     },
                   ),
                 ),
-                SizedBox(
-                  width: 10 * dataController.currentScaleFactor.value,
+                SizedBox(width: 10 * dataController.currentScaleFactor.value),
+                Expanded(
+                  // Ensures buttons share space evenly
+                  child: OutlinedButton(
+                    onPressed: () {
+                      Get.back();
+                    },
+                    style: ButtonStyle(
+                      shape: WidgetStateProperty.all(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                      ),
+                      padding: WidgetStateProperty.all(
+                        EdgeInsets.symmetric(
+                          horizontal:
+                              40 * dataController.currentScaleFactor.value,
+                          vertical:
+                              15 * dataController.currentScaleFactor.value,
+                        ),
+                      ),
+                    ),
+                    child: Text(
+                      'CANCEL',
+                      style: TextStyle(
+                          fontSize: dataController.normalTextSize.value),
+                    ),
+                  ),
                 ),
-                Flexible(
-                    child: OutlinedButton(
-                        onPressed: () {
-                          Get.back();
-                        },
-                        style: ButtonStyle(
-                            shape: WidgetStateProperty.all(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                            ),
-                            padding: WidgetStateProperty.all(
-                                EdgeInsets.symmetric(
-                                    horizontal: 40 *
-                                        dataController.currentScaleFactor.value,
-                                    vertical: 15 *
-                                        dataController
-                                            .currentScaleFactor.value))),
-                        child: Text(
-                          'CANCEL',
-                          style: TextStyle(
-                              fontSize: dataController.normalTextSize.value),
-                        )))
               ],
             )
           ],

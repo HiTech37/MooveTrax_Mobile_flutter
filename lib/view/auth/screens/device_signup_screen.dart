@@ -447,7 +447,7 @@ class DeviceSignupScreenState extends State<DeviceSignupScreen> {
                                                     255, 180, 87, 0),
                                             colorText: Colors.white,
                                             duration:
-                                                const Duration(seconds: 30),
+                                                const Duration(seconds: 1200),
                                             animationDuration: const Duration(
                                                 microseconds: 300));
                                         await checkGpsidIccidMatched();

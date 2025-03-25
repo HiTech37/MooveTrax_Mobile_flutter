@@ -20,6 +20,8 @@ class DataController extends GetxController {
   var currentPaymentItemId = ''.obs;
   var updateMap = 0.obs;
   var updateDevice = 0.obs;
+  // ignore: non_constant_identifier_names
+  var webBaseURI = 'https://test.moovetrax.com'.obs;
 
   void changeTabIndex(int index) {
     currentIndex.value = index;

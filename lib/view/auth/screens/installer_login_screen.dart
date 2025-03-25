@@ -395,6 +395,8 @@ class InstallerLoginScreenState extends State<InstallerLoginScreen> {
                                                 const Color.fromARGB(
                                                     255, 180, 87, 0),
                                             colorText: Colors.white,
+                                            duration:
+                                                const Duration(seconds: 1200),
                                             animationDuration: const Duration(
                                                 microseconds: 300));
                                         await authController
@@ -408,7 +410,7 @@ class InstallerLoginScreenState extends State<InstallerLoginScreen> {
                                           "mobile_installer": "0"
                                         });
 
-                                        checkGpsidIccidMatched();
+                                        await checkGpsidIccidMatched();
                                       }
                                     }
                                   }

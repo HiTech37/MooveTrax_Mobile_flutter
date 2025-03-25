@@ -1170,6 +1170,14 @@ class _DeviceSettingWidgetState extends State<DeviceSettingWidget> {
                             InkWell(
                                 onTap: () {
                                   Get.back();
+                                  // var deviceId =
+                                  //     dataController.currentDeviceId.value;
+                                  // print("=>$deviceId");
+                                  // var uri = Uri.parse(
+                                  //     "${dataController.webBaseURI}/share/$deviceId");
+                                  // print("=>$uri");
+
+                                  // await canLaunchUrl(canLaunchUrl)
                                   Get.toNamed('/share');
                                 },
                                 child: Padding(
