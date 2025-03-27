@@ -1,6 +1,12 @@
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 class DataController extends GetxController {
+  final box = GetStorage();
+
+  Map<String, dynamic>? get userData => box.read('loginInfo');
+  String? get installerKey => box.read('installerKey');
+
   var currentIndex = 0.obs;
   var geoGeoFenceEditingEnabled = false.obs;
   var playingPostionsHistory = false.obs;
@@ -22,6 +28,7 @@ class DataController extends GetxController {
   var updateDevice = 0.obs;
   // ignore: non_constant_identifier_names
   var webBaseURI = 'https://test.moovetrax.com'.obs;
+  var authToken = ''.obs;
 
   void changeTabIndex(int index) {
     currentIndex.value = index;
@@ -78,5 +85,15 @@ class DataController extends GetxController {
     titleTextSize.value = 18.0 * value;
     normalTextSize.value = 14.0 * value;
     smallTextSize.value = 12.0 * value;
+  }
+
+  void updateAuthToken() {
+    authToken.value = userData == null
+        ? installerKey == null
+            ? ''
+            : installerKey == ''
+                ? ''
+                : installerKey!
+        : userData!['token'];
   }
 }

@@ -12,6 +12,7 @@ import 'package:moovetrax/viewmodel/auth/controller/auth_controller.dart';
 import 'package:moovetrax/viewmodel/data_controller.dart';
 import 'package:moovetrax/viewmodel/device/controller/device_controller.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class DeviceSettingWidget extends StatefulWidget {
   const DeviceSettingWidget({
@@ -1168,22 +1169,74 @@ class _DeviceSettingWidgetState extends State<DeviceSettingWidget> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             InkWell(
-                                onTap: () {
-                                  Get.back();
-                                  // var deviceId =
-                                  //     dataController.currentDeviceId.value;
-                                  // print("=>$deviceId");
-                                  // var uri = Uri.parse(
-                                  //     "${dataController.webBaseURI}/share/$deviceId");
-                                  // print("=>$uri");
+                                onTap: () async {
+                                  var deviceId =
+                                      dataController.currentDeviceId.value;
+                                  if (deviceId == '') {
+                                    Get.snackbar("Failed",
+                                        "Device ID is empty. Please login again.",
+                                        backgroundColor: Colors.red,
+                                        colorText: Colors.white,
+                                        animationDuration:
+                                            const Duration(milliseconds: 300));
+                                  } else {
+                                    dataController.updateAuthToken();
+                                    var uri = Uri.parse(
+                                        "${dataController.webBaseURI}/share/$deviceId?token=${dataController.authToken}");
 
-                                  // await canLaunchUrl(canLaunchUrl)
-                                  Get.toNamed('/share');
+                                    if (await canLaunchUrl(uri)) {
+                                      await launchUrl(
+                                        uri,
+                                        webOnlyWindowName:
+                                            '_self', // Optional for web
+                                      );
+                                    }
+                                  }
+
+                                  // Get.toNamed('/share');
                                 },
                                 child: Padding(
                                   padding: const EdgeInsets.all(5),
                                   child: Text(
                                     'SHARE',
+                                    style: TextStyle(
+                                        fontSize:
+                                            dataController.normalTextSize.value,
+                                        color: Colors.green,
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                                )),
+                            InkWell(
+                                onTap: () async {
+                                  dataController
+                                      .setShowPlayPositionsHistory(true);
+                                  var deviceId =
+                                      dataController.currentDeviceId.value;
+                                  if (deviceId == '') {
+                                    Get.snackbar("Failed",
+                                        "Device ID is empty. Please login again.",
+                                        backgroundColor: Colors.red,
+                                        colorText: Colors.white,
+                                        animationDuration:
+                                            const Duration(milliseconds: 300));
+                                  } else {
+                                    dataController.updateAuthToken();
+                                    var uri = Uri.parse(
+                                        "${dataController.webBaseURI}/replay/$deviceId?token=${dataController.authToken}");
+
+                                    if (await canLaunchUrl(uri)) {
+                                      await launchUrl(
+                                        uri,
+                                        webOnlyWindowName:
+                                            '_self', // Optional for web
+                                      );
+                                    }
+                                  }
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(5),
+                                  child: Text(
+                                    'REPLAY',
                                     style: TextStyle(
                                         fontSize:
                                             dataController.normalTextSize.value,
@@ -1207,25 +1260,30 @@ class _DeviceSettingWidgetState extends State<DeviceSettingWidget> {
                                   )),
                             ),
                             InkWell(
-                                onTap: () {
-                                  Get.back();
-                                  dataController
-                                      .setShowPlayPositionsHistory(true);
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.all(5),
-                                  child: Text(
-                                    'REPLAY',
-                                    style: TextStyle(
-                                        fontSize:
-                                            dataController.normalTextSize.value,
-                                        color: Colors.green,
-                                        fontWeight: FontWeight.w600),
-                                  ),
-                                )),
-                            InkWell(
-                                onTap: () {
-                                  Get.toNamed('/notify-setting');
+                                onTap: () async {
+                                  var deviceId =
+                                      dataController.currentDeviceId.value;
+                                  if (deviceId == '') {
+                                    Get.snackbar("Failed",
+                                        "Device ID is empty. Please login again.",
+                                        backgroundColor: Colors.red,
+                                        colorText: Colors.white,
+                                        animationDuration:
+                                            const Duration(milliseconds: 300));
+                                  } else {
+                                    dataController.updateAuthToken();
+                                    var uri = Uri.parse(
+                                        "${dataController.webBaseURI}/main?token=${dataController.authToken}&deviceId=$deviceId&page=notify");
+
+                                    if (await canLaunchUrl(uri)) {
+                                      await launchUrl(
+                                        uri,
+                                        webOnlyWindowName:
+                                            '_self', // Optional for web
+                                      );
+                                    }
+                                  }
+                                  // Get.toNamed('/notify-setting');
                                 },
                                 child: Padding(
                                   padding: const EdgeInsets.all(5),
