@@ -1332,8 +1332,30 @@ class _DeviceSettingWidgetState extends State<DeviceSettingWidget> {
                                   ),
                                 )),
                             InkWell(
-                                onTap: () {
-                                  Get.toNamed('/device-edit');
+                                onTap: () async {
+                                  var deviceId =
+                                      dataController.currentDeviceId.value;
+                                  if (deviceId == '') {
+                                    Get.snackbar("Failed",
+                                        "Device ID is empty. Please login again.",
+                                        backgroundColor: Colors.red,
+                                        colorText: Colors.white,
+                                        animationDuration:
+                                            const Duration(milliseconds: 300));
+                                  } else {
+                                    dataController.updateAuthToken();
+                                    var uri = Uri.parse(
+                                        "${dataController.webBaseURI}/device/$deviceId?token=${dataController.authToken}&deviceId=$deviceId&page=edit");
+
+                                    if (await canLaunchUrl(uri)) {
+                                      await launchUrl(
+                                        uri,
+                                        webOnlyWindowName:
+                                            '_self', // Optional for web
+                                      );
+                                    }
+                                  }
+                                  // Get.toNamed('/device-edit');
                                 },
                                 child: Padding(
                                   padding: const EdgeInsets.all(5),
@@ -1347,8 +1369,30 @@ class _DeviceSettingWidgetState extends State<DeviceSettingWidget> {
                                   ),
                                 )),
                             InkWell(
-                                onTap: () {
-                                  Get.toNamed('/reports/events');
+                                onTap: () async {
+                                  var deviceId =
+                                      dataController.currentDeviceId.value;
+                                  if (deviceId == '') {
+                                    Get.snackbar("Failed",
+                                        "Device ID is empty. Please login again.",
+                                        backgroundColor: Colors.red,
+                                        colorText: Colors.white,
+                                        animationDuration:
+                                            const Duration(milliseconds: 300));
+                                  } else {
+                                    dataController.updateAuthToken();
+                                    var uri = Uri.parse(
+                                        "${dataController.webBaseURI}/reports/events/$deviceId?token=${dataController.authToken}&deviceId=$deviceId&page=log");
+
+                                    if (await canLaunchUrl(uri)) {
+                                      await launchUrl(
+                                        uri,
+                                        webOnlyWindowName:
+                                            '_self', // Optional for web
+                                      );
+                                    }
+                                  }
+                                  // Get.toNamed('/reports/events');
                                 },
                                 child: Padding(
                                   padding: const EdgeInsets.all(5),
@@ -1362,8 +1406,30 @@ class _DeviceSettingWidgetState extends State<DeviceSettingWidget> {
                                   ),
                                 )),
                             InkWell(
-                                onTap: () {
-                                  Get.toNamed('/toll-search');
+                                onTap: () async {
+                                  var deviceId =
+                                      dataController.currentDeviceId.value;
+                                  if (deviceId == '') {
+                                    Get.snackbar("Failed",
+                                        "Device ID is empty. Please login again.",
+                                        backgroundColor: Colors.red,
+                                        colorText: Colors.white,
+                                        animationDuration:
+                                            const Duration(milliseconds: 300));
+                                  } else {
+                                    dataController.updateAuthToken();
+                                    var uri = Uri.parse(
+                                        "${dataController.webBaseURI}/main?token=${dataController.authToken}&deviceId=$deviceId&page=toll");
+
+                                    if (await canLaunchUrl(uri)) {
+                                      await launchUrl(
+                                        uri,
+                                        webOnlyWindowName:
+                                            '_self', // Optional for web
+                                      );
+                                    }
+                                  }
+                                  // Get.toNamed('/toll-search');
                                 },
                                 child: Padding(
                                   padding: const EdgeInsets.all(5),
@@ -1377,9 +1443,31 @@ class _DeviceSettingWidgetState extends State<DeviceSettingWidget> {
                                   ),
                                 )),
                             InkWell(
-                                onTap: () {
-                                  Get.back();
-                                  Get.toNamed('/maintenaunce');
+                                onTap: () async {
+                                  var deviceId =
+                                      dataController.currentDeviceId.value;
+                                  if (deviceId == '') {
+                                    Get.snackbar("Failed",
+                                        "Device ID is empty. Please login again.",
+                                        backgroundColor: Colors.red,
+                                        colorText: Colors.white,
+                                        animationDuration:
+                                            const Duration(milliseconds: 300));
+                                  } else {
+                                    dataController.updateAuthToken();
+                                    var uri = Uri.parse(
+                                        "${dataController.webBaseURI}/main?token=${dataController.authToken}&deviceId=$deviceId&page=maint");
+
+                                    if (await canLaunchUrl(uri)) {
+                                      await launchUrl(
+                                        uri,
+                                        webOnlyWindowName:
+                                            '_self', // Optional for web
+                                      );
+                                    }
+                                  }
+                                  // Get.back();
+                                  // Get.toNamed('/maintenaunce');
                                 },
                                 child: Padding(
                                   padding: const EdgeInsets.all(5),
@@ -1393,9 +1481,31 @@ class _DeviceSettingWidgetState extends State<DeviceSettingWidget> {
                                   ),
                                 )),
                             InkWell(
-                                onTap: () {
-                                  Get.back();
-                                  Get.toNamed('/PL');
+                                onTap: () async {
+                                  var deviceId =
+                                      dataController.currentDeviceId.value;
+                                  if (deviceId == '') {
+                                    Get.snackbar("Failed",
+                                        "Device ID is empty. Please login again.",
+                                        backgroundColor: Colors.red,
+                                        colorText: Colors.white,
+                                        animationDuration:
+                                            const Duration(milliseconds: 300));
+                                  } else {
+                                    dataController.updateAuthToken();
+                                    var uri = Uri.parse(
+                                        "${dataController.webBaseURI}/main?token=${dataController.authToken}&deviceId=$deviceId&page=pl");
+
+                                    if (await canLaunchUrl(uri)) {
+                                      await launchUrl(
+                                        uri,
+                                        webOnlyWindowName:
+                                            '_self', // Optional for web
+                                      );
+                                    }
+                                  }
+                                  // Get.back();
+                                  // Get.toNamed('/PL');
                                 },
                                 child: Padding(
                                   padding: const EdgeInsets.all(5),
